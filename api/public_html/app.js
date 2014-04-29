@@ -5,8 +5,6 @@ var http = require('http');
 var path = require('path');
 var MongoClient = require('mongodb').MongoClient
         , format = require('util').format;
-var passport = require('passport');
-var LocalStrategy = require('passport-local').Strategy;
 
 server.listen(3000);
 
@@ -20,10 +18,39 @@ app.use(app.router);
 
 function requireAuth() {
     return function(req, res, next) {
-        if(req.headers['x-auth'] != null){
-            req.params.user = req.headers['x-auth'];
-            console.log(req.params.user);
-            next();
+        if (req.headers['x-auth'] != null) {
+            var authtoken = req.headers['x-auth'];
+            MongoClient.connect('mongodb://127.0.0.1:27017/users', function(err, db) {
+                if (err)
+                    throw err;
+
+                var collection = db.collection('tokens');
+
+                //FIND IF THE USERNAME AND PASSWORD EXIST
+                collection.findOne({_id: authtoken}, function(err, token) {
+                    if (err) {
+                        return res.status(401).send("Unauthorized");
+                    }
+
+                    if (!token) {
+                        return res.status(401).send("Unauthorized");
+                    }
+                    if (token.expiry > Date.now()) {
+                        collection = db.collection('authentications');
+                        collection.findOne({_id : token.user_id} , function(err,user){
+                            if (err) {
+                                return res.status(401).send("Unauthorized");
+                            }
+                            
+                            req.params.user = user;
+                            next();
+                        });
+                    }else
+                        return res.status(403).send("Unauthorized token.");
+
+                });
+
+            });
         }
         else
             return res.status(403).send("no x-auth");
@@ -31,6 +58,73 @@ function requireAuth() {
     }
 }
 
-app.get('/filter', requireAuth() , function(req, res) {
-    return res.status(200).send("found auth " + req.params.user);
+app.post('/register',function(req,res){
+    MongoClient.connect('mongodb://127.0.0.1:27017/users', function(err, db) {
+        if (err)
+            throw err;
+
+        var collection = db.collection('authentications');
+
+
+        var jsonBody = req.body;
+
+
+        collection.insert(jsonBody, {safe: true}, function(err, records) {
+            if (err) {
+                return res.status(400).send("User already exists");
+            }
+            console.log("Record added as " + records[0]._id);
+            return res.send("User added");
+        });
+
+    });
 });
+
+app.post('/login',function(req,res){
+    var username  = req.headers['x-username'];
+    var password  = req.headers['x-password'];
+    if(username == null || password == null){
+        res.status(400).send("Username and password required");
+    }
+    MongoClient.connect('mongodb://127.0.0.1:27017/users', function(err, db) {
+        if (err)
+            throw err;
+
+        var collection = db.collection('authentications');
+
+
+        var jsonBody = req.body;
+
+        //FIND IF THE USERNAME AND PASSWORD EXIST
+        collection.findOne({_id : username}, function(err, result) {
+            if (err) {
+                return res.status(400).send("Failed");
+            }
+            if(result == null){
+                return res.status(404).send("username/password incorrect");
+            }
+            
+            var token = Math.random().toString(36).slice(2);
+            
+            var currentTime = Date.now();
+            var expiry = currentTime+86400000; //adding a day to the current
+            var tokenCollection = db.collection("tokens");
+            
+            tokenCollection.insert({_id : token ,"user_id" : username , "expiry" : expiry},{safe: true},
+                function(err,result){
+                    if (err) {
+                    return res.status(400).send("Failed to login");
+                }
+                return res.status(200).send(token);
+            });
+            
+        });
+
+    });
+});
+
+
+app.get('/filter', requireAuth() , function(req, res) {
+    return res.status(200).send("user age : " + req.params.user.age);
+});
+

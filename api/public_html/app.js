@@ -120,7 +120,7 @@ app.post('/login',function(req,res){
                     if (err) {
                     return res.status(400).send("Failed to login");
                 }
-                return res.status(200).send(token);
+                return res.status(200).send({"token" : token});
             });
             
         });

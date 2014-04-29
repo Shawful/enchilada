@@ -58,6 +58,11 @@ function requireAuth() {
     }
 }
 
+app.get('/', function (req, res) {
+  res.sendfile(__dirname + '/index.html');
+  //return res.send("hello")
+});
+
 app.post('/register',function(req,res){
     MongoClient.connect('mongodb://127.0.0.1:27017/users', function(err, db) {
         if (err)

@@ -130,6 +130,6 @@ app.post('/login',function(req,res){
 
 
 app.get('/filter', requireAuth() , function(req, res) {
-    return res.status(200).send("user age : " + req.params.user.age);
+    return res.status(200).send("user age : " + req.params.user._id);
 });
 

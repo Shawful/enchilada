@@ -63,7 +63,7 @@ app.get('/', function (req, res) {
   //return res.send("hello")
 });
 
-app.post('/user/register',function(req,res){
+app.post('/user',function(req,res){ //CREATE A NEW ACCOUNT
     MongoClient.connect('mongodb://127.0.0.1:27017/users', function(err, db) {
         if (err)
             throw err;
@@ -85,7 +85,7 @@ app.post('/user/register',function(req,res){
     });
 });
 
-app.post('/user',function(req,res){
+app.post('/user/login',function(req,res){ //LOGIN TO THE EXISTING ACCOUNT
     var username  = req.headers['x-username'];
     var password  = req.headers['x-password'];
     if(username == null || password == null){
@@ -133,7 +133,7 @@ app.get('/filter', requireAuth() , function(req, res) {
     return res.status(200).send("user age : " + req.params.user._id);
 });
 
-app.put('/user/votes/:billId', requireAuth() , function(req, res) {
+app.put('/user/votes/:billId', requireAuth() , function(req, res) {  //VOTE ON CERTAIN BILL ID
     
     var user = req.params.user;
     var vote = req.query.vote;
@@ -169,36 +169,23 @@ app.put('/user/votes/:billId', requireAuth() , function(req, res) {
     
 });
 
-app.put('/user/votes/:billId', requireAuth() , function(req, res) {
+app.put('/user/votes/:billId/ignore', requireAuth() , function(req, res) { //IGNORE A CERTAIN BILL ID
     
     var user = req.params.user;
     var vote = req.query.vote;
     var billId = req.param('billId');
-    if(!vote){
-        return res.status(400).send("vote missing");
-    }
+   
    MongoClient.connect('mongodb://127.0.0.1:27017/users', function(err, db) {
         if (err)
             throw err;
 
         var collection = db.collection('authentications');
-        var arrayName= "";
-        if(vote == true){
-            collection.update({_id : user._id} ,{$addToSet : { liked : billId}}, function(err, records) {
+            collection.update({_id : user._id} ,{$addToSet : { ignored : billId}}, function(err, records) {
             if (err) {
                 return res.status(400).send("failed to record vote");
             }
             return res.send("Vote for the bill successfull");
             });
-        }
-        else{
-            collection.update({_id : user._id} ,{$addToSet : { disliked : billId}}, function(err, records) {
-            if (err) {
-                return res.status(400).send("failed to record vote");
-            }
-            return res.send("Vote for the bill successfull");
-            });
-        }
         
 
     });

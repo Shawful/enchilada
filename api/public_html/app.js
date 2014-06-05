@@ -186,19 +186,19 @@ app.put('/user/votes/:billId/ignore', requireAuth() , function(req, res) { //IGN
             }
             return res.send("Vote for the bill successfull");
             });
-        
-
-    });
-    
+        });
 });
 
 
-app.get('/user/votes', requireAuth() , function(req, res) {
+app.get('/user/votes/liked', requireAuth() , function(req, res) {
     var user = req.params.user;
     return res.status(200).send(user.liked);
 });
 
-
+app.get('/user/votes/disliked', requireAuth() , function(req, res) {
+    var user = req.params.user;
+    return res.status(200).send(user.disliked);
+});
 
 
 

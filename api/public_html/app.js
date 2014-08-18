@@ -233,3 +233,29 @@ app.get('/user/districts' , function(req,res){
     getBills.end();
 
 });
+
+
+app.get('/user/legislators' , function(req,res){
+    var apikey = config.sunlight_apikey;
+    var zipcode = req.query.zipcode;
+    var options = {
+                host: 'congress.api.sunlightfoundation.com',
+                path: '/legislators/locate/?fields=bioguide_id,chamber,first_name,middle_name,state,phone,last_name&zip='+zipcode,
+                method: 'GET',
+                headers: {'x-apikey': apikey }
+    };
+    
+    var legislators = http.request(options, function( response) {
+                response.on('data', function (data) {
+                        return res.status(200).send(data);
+                });
+                response.on('error', function (e) {
+                        console.log(e);
+                        return  res.status(400).send(e);
+                });
+    });
+                        
+    legislators.write("");
+    legislators.end();
+
+});

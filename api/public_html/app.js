@@ -7,13 +7,19 @@ var MongoClient = require('mongodb').MongoClient
         , format = require('util').format;
 
 server.listen(3000);
-
+var config = require('/opt/apps/properties/config.json');
 
 app.use(express.bodyParser());
 app.use(express.methodOverride());
 //app.use(express.static(__dirname + '/public'));
 app.use(express.static(path.join(__dirname + '/public')));
 app.use(app.router);
+
+app.all('*', function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "X-Requested-With");
+  next();
+ });
 
 
 function requireAuth() {
@@ -59,9 +65,11 @@ function requireAuth() {
 }
 
 app.get('/', function (req, res) {
+  console.log(__dirname);
   res.sendfile(__dirname + '/index.html');
   //return res.send("hello")
 });
+
 
 app.post('/user',function(req,res){ //CREATE A NEW ACCOUNT
     MongoClient.connect('mongodb://127.0.0.1:27017/users', function(err, db) {
@@ -201,4 +209,27 @@ app.get('/user/votes/disliked', requireAuth() , function(req, res) {
 });
 
 
+app.get('/user/districts' , function(req,res){
+    var apikey = config.sunlight_apikey;
+    var zipcode = req.query.zipcode;
+    var options = {
+                host: 'congress.api.sunlightfoundation.com',
+                path: '/districts/locate/?zip='+zipcode ,
+                method: 'GET',
+                headers: {'x-apikey': apikey }
+    };
+    
+    var getBills = http.request(options, function( response) {
+                response.on('data', function (data) {
+                        return res.status(200).send(data);
+                });
+                response.on('error', function (e) {
+                        console.log(e);
+                        return  res.status(400).send(e);
+                });
+    });
+                        
+    getBills.write("");
+    getBills.end();
 
+});

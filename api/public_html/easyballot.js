@@ -192,12 +192,12 @@ app.put('/user/bills/:billId/:vote', requireAuth(), function(req, res) {  //VOTE
 
 });
 
-app.get('/user/votes/liked', requireAuth() , function(req, res) {
+app.get('/user/bills/liked', requireAuth() , function(req, res) {
     var user = req.params.user;
     return res.status(200).send(user.liked);
 });
 
-app.get('/user/votes/disliked', requireAuth() , function(req, res) {
+app.get('/user/bills/disliked', requireAuth() , function(req, res) {
     var user = req.params.user;
     return res.status(200).send(user.disliked);
 });

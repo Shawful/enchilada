@@ -70,7 +70,6 @@ app.get('/', function (req, res) {
   //return res.send("hello")
 });
 
-
 app.post('/user',function(req,res){ //CREATE A NEW ACCOUNT
     MongoClient.connect('mongodb://127.0.0.1:27017/users', function(err, db) {
         if (err)
@@ -137,14 +136,10 @@ app.post('/user/login',function(req,res){ //LOGIN TO THE EXISTING ACCOUNT
 });
 
 
-app.get('/filter', requireAuth() , function(req, res) {
-    return res.status(200).send("user age : " + req.params.user._id);
-});
-
-app.put('/user/votes/:billId', requireAuth() , function(req, res) {  //VOTE ON CERTAIN BILL ID
+app.put('/user/bills/:billId/:vote', requireAuth() , function(req, res) {  //VOTE ON CERTAIN BILL ID
     
     var user = req.params.user;
-    var vote = req.query.vote;
+    var vote = req.param('vote');
     var billId = req.param('billId');
     if(!vote){
         return res.status(400).send("vote missing");
@@ -176,124 +171,3 @@ app.put('/user/votes/:billId', requireAuth() , function(req, res) {  //VOTE ON C
     });
     
 });
-
-app.put('/user/votes/:billId/ignore', requireAuth() , function(req, res) { //IGNORE A CERTAIN BILL ID
-    
-    var user = req.params.user;
-    var vote = req.query.vote;
-    var billId = req.param('billId');
-   
-   MongoClient.connect('mongodb://127.0.0.1:27017/users', function(err, db) {
-        if (err)
-            throw err;
-
-        var collection = db.collection('authentications');
-            collection.update({_id : user._id} ,{$addToSet : { ignored : billId}}, function(err, records) {
-            if (err) {
-                return res.status(400).send("failed to record vote");
-            }
-            return res.send("Vote for the bill successfull");
-            });
-        });
-});
-
-
-app.get('/user/votes/liked', requireAuth() , function(req, res) {
-    var user = req.params.user;
-    return res.status(200).send(user.liked);
-});
-
-app.get('/user/votes/disliked', requireAuth() , function(req, res) {
-    var user = req.params.user;
-    return res.status(200).send(user.disliked);
-});
-
-
-app.get('/user/districts' , function(req,res){
-    var apikey = config.sunlight_apikey;
-    var zipcode = req.query.zipcode;
-    var options = {
-                host: 'congress.api.sunlightfoundation.com',
-                path: '/districts/locate/?zip='+zipcode ,
-                method: 'GET',
-                headers: {'x-apikey': apikey }
-    };
-    
-    var getBills = http.request(options, function( response) {
-                response.on('data', function (data) {
-                        return res.status(200).send(data);
-                });
-                response.on('error', function (e) {
-                        console.log(e);
-                        return  res.status(400).send(e);
-                });
-    });
-                        
-    getBills.write("");
-    getBills.end();
-
-});
-
-
-
-
-
-app.get('/user/legislators' , function(req,res){
-    var apikey = config.sunlight_apikey;
-    var zipcode = req.query.zipcode;
-    var options = {
-                host: 'congress.api.sunlightfoundation.com',
-                path: '/legislators/locate/?fields=govtrack_id,bioguide_id,chamber,first_name,middle_name,state,phone,last_name&zip='+zipcode,
-                method: 'GET',
-                headers: {'x-apikey': apikey }
-    };
-    
-    var legislators = http.request(options, function( response) {
-                response.on('data', function (data) {
-                        data = JSON.parse(data);
-                        
-                        return res.status(200).send(data.results);
-                });
-                response.on('error', function (e) {
-                        console.log(e);
-                        return  res.status(400).send(e);
-                });
-    });
-                        
-    legislators.write("");
-    legislators.end();
-
-});
-
-
-app.get('/senator/:personId/votes' , function(req,res){
-    var options = {
-                host: 'www.govtrack.us',
-                path: '/api/v2/vote_voter?person=412573&vote=113152&limit=3',
-                method: 'GET'
-    };
-    var senatorVotes = http.request(options, function(response) {
-                //console.log(response.body);
-                var voteObjects=[];
-
-                response.on('data', function (data) {
-                        data = JSON.parse(data);
-                        //console.log(data.objects);
-                        for (var o in data.objects){
-                            console.log(o.vote.related_bill+"- "+o.option.value);
-                            voteObjects.push({bill_id : o.vote.related_bill , vote : o.option.value});
-                            
-                        }
-                        return res.status(200).send(voteObjects);
-                });
-                response.on('error', function (e) {
-                        console.log(e);
-                        return  res.status(400).send(e);
-                });
-    });
-                        
-    senatorVotes.write("");
-    senatorVotes.end();
-});
-
-

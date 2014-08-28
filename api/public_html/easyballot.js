@@ -136,58 +136,68 @@ app.post('/user/login',function(req,res){ //LOGIN TO THE EXISTING ACCOUNT
 });
 
 
-app.put('/user/bills/:billId/:vote', requireAuth() , function(req, res) {  //VOTE ON CERTAIN BILL ID
-    
+app.put('/user/bills/:billId/:vote', requireAuth(), function(req, res) {  //VOTE ON CERTAIN BILL ID
+
     var user = req.params.user;
     var vote = req.param('vote');
     var billId = req.param('billId');
-    if(!vote){
+    if (!vote) {
         return res.status(400).send("vote missing");
     }
-   MongoClient.connect('mongodb://127.0.0.1:27017/users', function(err, db) {
+    MongoClient.connect('mongodb://127.0.0.1:27017/users', function(err, db) {
         if (err)
             throw err;
 
         var collection = db.collection('authentications');
-        var arrayName= "";
-        if(vote == true){
-            collection.update({_id : user._id} ,{$addToSet : { liked : billId}}, function(err, records) {
-            if (err) {
-                return res.status(400).send("failed to record vote");
-            }else{
-                collection.update({_id : user._id} ,{$pull : { disliked : billId}}, function(err, records) {
+        var arrayName = "";
+        if (vote == true) {
+            collection.update({_id: user._id}, {$addToSet: {liked: billId}}, function(err, records) {
                 if (err) {
-                    console.log("failed to update the bill "+billId);
+                    return res.status(400).send("failed to record vote");
+                } else {
+                    collection.update({_id: user._id}, {$pull: {disliked: billId}}, function(err, records) {
+                        if (err) {
+                            console.log("failed to update the bill " + billId);
+                        }
+
+                        return res.send("Vote for the bill successfull");
+                    });
+
+
                 }
-                    
-                    return res.send("Vote for the bill successfull");
-                });
-                
-                
-            }
-            
+
             });
         }
-        else{
-            collection.update({_id : user._id} ,{$addToSet : { disliked : billId}}, function(err, records) {
-            if (err) {
-                return res.status(400).send("failed to record vote");
-            }else{
-                collection.update({_id : user._id} ,{$pull : { liked : billId}}, function(err, records) {
+        else {
+            collection.update({_id: user._id}, {$addToSet: {disliked: billId}}, function(err, records) {
                 if (err) {
-                    console.log("failed to update the bill "+billId);
+                    return res.status(400).send("failed to record vote");
+                } else {
+                    collection.update({_id: user._id}, {$pull: {liked: billId}}, function(err, records) {
+                        if (err) {
+                            console.log("failed to update the bill " + billId);
+                        }
+
+                        return res.send("Vote for the bill successfull");
+                    });
+
+
                 }
-                    
-                    return res.send("Vote for the bill successfull");
-                });
-                
-                
-            }
-            
+
             });
         }
-        
+
 
     });
-    
+
+});
+
+app.get('/user/votes/liked', requireAuth() , function(req, res) {
+    var user = req.params.user;
+    return res.status(200).send(user.liked);
+});
+
+app.get('/user/votes/disliked', requireAuth() , function(req, res) {
+    var user = req.params.user;
+    return res.status(200).send(user.disliked);
 });

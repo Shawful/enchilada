@@ -154,16 +154,36 @@ app.put('/user/bills/:billId/:vote', requireAuth() , function(req, res) {  //VOT
             collection.update({_id : user._id} ,{$addToSet : { liked : billId}}, function(err, records) {
             if (err) {
                 return res.status(400).send("failed to record vote");
+            }else{
+                collection.update({_id : user._id} ,{$pull : { disliked : billId}}, function(err, records) {
+                if (err) {
+                    console.log("failed to update the bill "+billId);
+                }
+                    
+                    return res.send("Vote for the bill successfull");
+                });
+                
+                
             }
-            return res.send("Vote for the bill successfull");
+            
             });
         }
         else{
             collection.update({_id : user._id} ,{$addToSet : { disliked : billId}}, function(err, records) {
             if (err) {
                 return res.status(400).send("failed to record vote");
+            }else{
+                collection.update({_id : user._id} ,{$pull : { liked : billId}}, function(err, records) {
+                if (err) {
+                    console.log("failed to update the bill "+billId);
+                }
+                    
+                    return res.send("Vote for the bill successfull");
+                });
+                
+                
             }
-            return res.send("Vote for the bill successfull");
+            
             });
         }
         

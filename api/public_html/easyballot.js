@@ -193,48 +193,90 @@ app.put('/user/bills/:billId/:vote', requireAuth(), function(req, res) {  //VOTE
 });
 
 app.get('/user/bills/liked', requireAuth(), function(req, res) {
+    var apikey = config.sunlight_apikey;
     var user = req.params.user;
     var billCount = 0;
     var timelineObjects = [];
-    if(user.liked.length > 0){
-    for (var u in user.liked) {
+    if (user.liked.length > 0) {
         
-        var options = {
-            host: 'congress.api.sunlightfoundation.com',
-            path: '/bills/search?bill_id='+u+'&fields=bill_id,official_title,short_title',
-            method: 'GET'
-        };
-        
-        var bills = http.request(options, function(response) {
-                billCount = billCount -1 ;
-                response.on('data', function (data) {
-                        data = JSON.parse(data);
-                        timelineObjects.push(data);
-                         
-                         
-                         if (billCount == user.liked.length - 1) {
-                                    //console.log(timelineObjects);
-                                    return res.send(timelineObjects);
-                        }
-                                billCount++;
-                        
+        for (var i in user.liked) {
+            var billId = user.liked[i];
+            
+            var options = {
+                host: 'congress.api.sunlightfoundation.com',
+                path: '/bills/search?bill_id=' + billId + '&fields=bill_id,official_title,short_title',
+                method: 'GET',
+                headers: {'x-apikey': apikey }
+            };
+
+            var bills = http.request(options, function(response) {
+                response.on('data', function(data) {
+                    data = JSON.parse(data);
+                    timelineObjects.push(data);
+
+
+                    if (billCount == user.liked.length - 1) {
+                        //console.log(timelineObjects);
+                        return res.send(timelineObjects);
+                    }
+                    billCount++;
+
                 });
-                response.on('error', function (e) {
-                        console.log(e);
-                        return  res.status(400).send(e);
+                response.on('error', function(e) {
+                    console.log(e);
+                    return  res.status(400).send(e);
                 });
-        });
-    bills.write("");
-    bills.end();
-        
-    }
+            });
+            bills.write("");
+            bills.end();
+
+        }
     }
     else
         return res.status(200).send(user.liked);
 });
 
 app.get('/user/bills/disliked', requireAuth() , function(req, res) {
+    var apikey = config.sunlight_apikey;
     var user = req.params.user;
-    return res.status(200).send(user.disliked);
+    var billCount = 0;
+    var timelineObjects = [];
+    if (user.disliked.length > 0) {
+        
+        for (var i in user.disliked) {
+            var billId = user.disliked[i];
+            
+            var options = {
+                host: 'congress.api.sunlightfoundation.com',
+                path: '/bills/search?bill_id=' + billId + '&fields=bill_id,official_title,short_title',
+                method: 'GET',
+                headers: {'x-apikey': apikey }
+            };
+
+            var bills = http.request(options, function(response) {
+                response.on('data', function(data) {
+                    data = JSON.parse(data);
+                    timelineObjects.push(data);
+
+
+                    if (billCount == user.disliked.length - 1) {
+                        //console.log(timelineObjects);
+                        return res.send(timelineObjects);
+                    }
+                    billCount++;
+
+                });
+                response.on('error', function(e) {
+                    console.log(e);
+                    return  res.status(400).send(e);
+                });
+            });
+            bills.write("");
+            bills.end();
+
+        }
+    }
+    else
+        return res.status(200).send(user.disliked);
 });
 

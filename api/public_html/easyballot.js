@@ -192,8 +192,42 @@ app.put('/user/bills/:billId/:vote', requireAuth(), function(req, res) {  //VOTE
 
 });
 
-app.get('/user/bills/liked', requireAuth() , function(req, res) {
+app.get('/user/bills/liked', requireAuth(), function(req, res) {
     var user = req.params.user;
+    var billCount = 0;
+    var timelineObjects = [];
+    for (var u in user.liked) {
+        
+        var options = {
+            host: 'congress.api.sunlightfoundation.com',
+            path: '/bills/search?bill_id='+u+'&fields=bill_id,official_title,short_title',
+            method: 'GET'
+        };
+        
+        var bills = http.request(options, function(response) {
+                billCount = billCount -1 ;
+                response.on('data', function (data) {
+                        data = JSON.parse(data);
+                        timelineObjects.push(data);
+                         
+                         
+                         if (billCount == user.liked.length - 1) {
+                                    //console.log(timelineObjects);
+                                    return res.send(timelineObjects);
+                        }
+                                billCount++;
+                        
+                });
+                response.on('error', function (e) {
+                        console.log(e);
+                        return  res.status(400).send(e);
+                });
+        });
+    bills.write("");
+    bills.end();
+        
+    }
+
     return res.status(200).send(user.liked);
 });
 
@@ -201,3 +235,4 @@ app.get('/user/bills/disliked', requireAuth() , function(req, res) {
     var user = req.params.user;
     return res.status(200).send(user.disliked);
 });
+

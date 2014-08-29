@@ -135,7 +135,50 @@ app.post('/user/login',function(req,res){ //LOGIN TO THE EXISTING ACCOUNT
     });
 });
 
+//SAVE USER ZIP CODE
+app.put('/user/zipcode/:zipcode', requireAuth() , function(req, res) { //IGNORE A CERTAIN BILL ID
+    
+    var user = req.params.user;
+    var zipcode = req.param('zipcode');
+    
+   MongoClient.connect('mongodb://127.0.0.1:27017/users', function(err, db) {
+        if (err)
+            throw err;
 
+        var collection = db.collection('authentications');
+            collection.update({_id : user._id} ,{$set : { "zipcode ": zipcode}}, function(err, records) {
+            if (err) {
+                return res.status(400).send("failed to record vote");
+            }
+            return res.send("zipcode saved");
+            });
+        });
+});
+
+//SAVE ZIPCODE BASED REPS  Req body : ["asdasd","adasdas"]
+app.put('/user/reps', requireAuth() , function(req, res) { //IGNORE A CERTAIN BILL ID
+    var user = req.params.user;
+    var jsonBody = req.body;
+    
+   MongoClient.connect('mongodb://127.0.0.1:27017/users', function(err, db) {
+        if (err)
+            throw err;
+
+        var collection = db.collection('authentications');
+            collection.update({_id : user._id} ,{$addToSet:{"reps" : {$each : jsonBody}}}, function(err, records) {
+            if (err) {
+                return res.status(400).send("failed to record vote");
+            }
+            return res.send("Reps saved");
+            });
+        });
+});
+
+
+
+
+
+// SAVE USER VOTE FOR A BILL ID
 app.put('/user/bills/:billId/:vote', requireAuth(), function(req, res) {  //VOTE ON CERTAIN BILL ID
 
     var user = req.params.user;
@@ -279,4 +322,6 @@ app.get('/user/bills/disliked', requireAuth() , function(req, res) {
     else
         return res.status(200).send(user.disliked);
 });
+
+
 

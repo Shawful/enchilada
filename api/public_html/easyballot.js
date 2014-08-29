@@ -212,7 +212,7 @@ app.get('/user/bills/liked', requireAuth(), function(req, res) {
             var bills = http.request(options, function(response) {
                 response.on('data', function(data) {
                     data = JSON.parse(data);
-                    timelineObjects.push(data);
+                    timelineObjects.push(data.results[0]);
 
 
                     if (billCount == user.liked.length - 1) {
@@ -256,7 +256,7 @@ app.get('/user/bills/disliked', requireAuth() , function(req, res) {
             var bills = http.request(options, function(response) {
                 response.on('data', function(data) {
                     data = JSON.parse(data);
-                    timelineObjects.push(data);
+                    timelineObjects.push(data.results[0]);
 
 
                     if (billCount == user.disliked.length - 1) {

@@ -196,6 +196,7 @@ app.get('/user/bills/liked', requireAuth(), function(req, res) {
     var user = req.params.user;
     var billCount = 0;
     var timelineObjects = [];
+    if(user.liked.length > 0){
     for (var u in user.liked) {
         
         var options = {
@@ -227,8 +228,9 @@ app.get('/user/bills/liked', requireAuth(), function(req, res) {
     bills.end();
         
     }
-
-    return res.status(200).send(user.liked);
+    }
+    else
+        return res.status(200).send(user.liked);
 });
 
 app.get('/user/bills/disliked', requireAuth() , function(req, res) {

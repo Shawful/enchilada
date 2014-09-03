@@ -251,35 +251,98 @@ app.post('/user/bills/:billId/:vote', requireAuth(), function(req, res) {  //VOT
 //UPDATE A USER VOTE FOR A BILL ID
 app.put('/user/bills/:billId/:vote', requireAuth(), function(req, res) {  //VOTE ON CERTAIN BILL ID
 
-    var user = req.params.user;
+//    var user = req.params.user;
+//    var vote = req.param('vote');
+//    var billId = req.param('billId');
+//    if (!vote) {
+//        return res.status(400).send("vote missing");
+//    }
+//    if(vote==1)
+//        vote =true;
+//    else
+//        vote =false;
+//    
+//    MongoClient.connect('mongodb://127.0.0.1:27017/users', function(err, db) {
+//        if (err)
+//            throw err;
+//
+//        var collection = db.collection('authentications');
+//        collection.update({_id: user._id ,  "votes.bill_id" : billId}, {$set :{"votes.$.vote" : vote}}, function(err, records) {
+//                if (err) {
+//                    return res.status(400).send("failed to record vote");
+//                } else {
+//                    collection.update({_id: user._id}, {$pull: {disliked: billId}}, function(err, records) {
+//                        if (err) {
+//                            console.log("failed to update the bill " + billId);
+//                        }
+//
+//                        return res.send("Vote for the bill successfull");
+//                    });
+//
+//                }
+//        });
+//    });
+var user = req.params.user;
     var vote = req.param('vote');
     var billId = req.param('billId');
+    var senators = user.senators;
     if (!vote) {
         return res.status(400).send("vote missing");
     }
-    if(vote==1)
-        vote =true;
+    
+    if (vote == 1)
+        vote = true;
     else
-        vote =false;
+        vote = false;
     
     MongoClient.connect('mongodb://127.0.0.1:27017/users', function(err, db) {
         if (err)
             throw err;
 
         var collection = db.collection('authentications');
-        collection.update({_id: user._id ,  "votes.bill_id" : billId}, {$set :{"votes.$.vote" : vote}}, function(err, records) {
-                if (err) {
-                    return res.status(400).send("failed to record vote");
-                } else {
-                    collection.update({_id: user._id}, {$pull: {disliked: billId}}, function(err, records) {
-                        if (err) {
-                            console.log("failed to update the bill " + billId);
-                        }
+        var arrayName = "";
+        collection.update({_id: user._id,  "votes.bill_id" : billId}, {$set :{"votes.$.vote" : vote}}, function(err, records) {
+            if (err) {
+                console.log(err);
+                return res.status(400).send("failed to record vote");
+            } else {
+                for (var i in senators) {
+                    var senator = senators[i];
+                    var options = {
+                        host: 'congress.api.sunlightfoundation.com',
+                        path: '/votes?voter_ids.' + senator.id + '__exists=true&vote_type=passage&bill_id=' + billId + '&fields=voters.' + senator.id + '.vote',
+                        method: 'GET',
+                        headers: {'x-apikey': apikey}
+                    };
 
-                        return res.send("Vote for the bill successfull");
+                    var senatorVote = http.request(options, function(response) {
+                        response.on('data', function(data) {
+                            data = JSON.parse(data);
+                            if (data.count > 0) {
+                                var biodguideId = senator.id;
+                                console.log(data.results[0].voters[biodguideId].vote);
+                                if ((vote === true && data.results[0].voters[biodguideId].vote != "Yea") ||
+                                        (vote === false && data.results[0].voters[biodguideId].vote === "Yea")) {
+                                    collection.update({_id: user._id, "senators.id": biodguideId}, {$inc : {"senators.$.disagree" : 1}}, function(err, records) {
+                                        if (err) {
+                                            console.log("Disagreement failed with  "+err);
+                                        } else {
+                                            console.log("successfully recorded disagreement");
+
+                                        }
+                                    });
+                                }
+                            }
+                        });
+                        response.on('error', function(e) {
+                            console.log(e);
+                        });
                     });
-
+                    senatorVote.write("");
+                    senatorVote.end();
                 }
+                return res.send("Vote for the bill successfull");
+            }
         });
     });
 

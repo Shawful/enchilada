@@ -191,7 +191,7 @@ app.post('/user/bills/:billId/:vote', requireAuth(), function(req, res) {  //VOT
         vote = false;
     var userVotes = user.votes;
     for(var iter in userVotes){
-        lif(billId === userVotes[iter]["bill_id"] )
+        if(billId === userVotes[iter]["bill_id"] )
             return res.status(400).send("Cannot recast a vote on a bill.");
     }
     

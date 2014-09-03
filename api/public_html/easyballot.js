@@ -184,11 +184,17 @@ app.post('/user/bills/:billId/:vote', requireAuth(), function(req, res) {  //VOT
     if (!vote) {
         return res.status(400).send("vote missing");
     }
+    
     if (vote == 1)
         vote = true;
     else
         vote = false;
-
+    var userVotes = user.votes;
+    for(var iter in userVotes){
+        lif(billId === userVotes[iter]["bill_id"] )
+            return res.status(400).send("Cannot recast a vote on a bill.");
+    }
+    
     MongoClient.connect('mongodb://127.0.0.1:27017/users', function(err, db) {
         if (err)
             throw err;
@@ -280,16 +286,16 @@ app.put('/user/bills/:billId/:vote', requireAuth(), function(req, res) {  //VOTE
 });
 
 
-//GET ALL THE LIKED BILLS
-app.get('/user/bills/liked', requireAuth(), function(req, res) {
+//GET ALL THE BILLS
+app.get('/user/bills', requireAuth(), function(req, res) {
     var apikey = config.sunlight_apikey;
     var user = req.params.user;
     var billCount = 0;
     var timelineObjects = [];
     if (user.liked.length > 0) {
         
-        for (var i in user.liked) {
-            var billId = user.liked[i];
+        for (var i in user.votes) {
+            var billId = user.votes[i];
             
             var options = {
                 host: 'congress.api.sunlightfoundation.com',
@@ -326,53 +332,6 @@ app.get('/user/bills/liked', requireAuth(), function(req, res) {
 });
 
 
-//GET ALL THE DISLIKED BILLS
-app.get('/user/bills/disliked', requireAuth() , function(req, res) {
-    var apikey = config.sunlight_apikey;
-    var user = req.params.user;
-    var billCount = 0;
-    var timelineObjects = [];
-    if (user.disliked.length > 0) {
-        
-        for (var i in user.disliked) {
-            var billId = user.disliked[i];
-            
-            var options = {
-                host: 'congress.api.sunlightfoundation.com',
-                path: '/bills/search?bill_id=' + billId + '&fields=bill_id,official_title,short_title',
-                method: 'GET',
-                headers: {'x-apikey': apikey }
-            };
-
-            var bills = http.request(options, function(response) {
-                response.on('data', function(data) {
-                    data = JSON.parse(data);
-                    timelineObjects.push(data.results[0]);
-
-
-                    if (billCount == user.disliked.length - 1) {
-                        //console.log(timelineObjects);
-                        return res.send(timelineObjects);
-                    }
-                    billCount++;
-
-                });
-                response.on('error', function(e) {
-                    console.log(e);
-                    return  res.status(400).send(e);
-                });
-            });
-            bills.write("");
-            bills.end();
-
-        }
-    }
-    else
-        return res.status(200).send(user.disliked);
-});
-
-
-
 //CALCULATE REP WORTHINESS
 app.get('/user/reps', requireAuth() , function(req, res) {
     var user = req.params.user;
@@ -393,5 +352,89 @@ app.get('/user/reps', requireAuth() , function(req, res) {
     
     return res.status(200).send(repWorthiness);
     
+});
+
+
+app.post('/user/reps' , requireAuth() , function(req,res){
+    
+    var user = req.params.user;
+    var reps = user.senators;
+    var repArray = req.body;
+    var senatorObjects = [];
+    for (var i in repArray) {
+        for (var j in reps) {
+            if (repArray[i] === reps[j]["id"]) {
+                return res.status(400).send("Rep "+reps[j]["id"]+" already saved ");
+            }
+        }
+    }
+    for(var i in repArray) {
+        senatorObjects.push({"id" : repArray[i] , "disagree" : 0})
+    }
+    
+    MongoClient.connect('mongodb://127.0.0.1:27017/users', function(err, db) {
+        if (err)
+            throw err;
+
+        var collection = db.collection('authentications');
+
+        collection.update({"_id" : user._id}, {$pushAll : {"senators" : senatorObjects} } , function(err, records) {
+            if (err) {
+                return res.status(400).send("User already exists");
+            }
+            console.log("Record added");
+            return res.send("Reps added");
+        });
+
+    });
+    
+});
+
+app.delete('/user/reps/:repId', requireAuth(), function(req, res) {
+
+    var user = req.params.user;
+    var repId = req.param('repId');
+
+    MongoClient.connect('mongodb://127.0.0.1:27017/users', function(err, db) {
+        if (err)
+            throw err;
+
+        var collection = db.collection('authentications');
+
+        collection.update({"_id": user._id}, {$pull: {"senators": {"id": repId}}}, function(err, records) {
+            if (err) {
+                return res.status(400).send("rep id "+repId+" does not exist");
+            }
+            return res.send("Rep " + repId + " deleted");
+        });
+    });
+
+});
+
+app.get('/user/zipcode/:zipcode/reps' , function(req,res){
+    
+    var zipcode = req.param('zipcode');
+    var options = {
+                host: 'congress.api.sunlightfoundation.com',
+                path: '/legislators/locate/?fields=govtrack_id,bioguide_id,chamber,first_name,middle_name,state,phone,last_name&zip='+zipcode,
+                method: 'GET',
+                headers: {'x-apikey': apikey }
+    };
+    
+    var legislators = http.request(options, function( response) {
+                response.on('data', function (data) {
+                        data = JSON.parse(data);
+                        
+                        return res.status(200).send(data.results);
+                });
+                response.on('error', function (e) {
+                        console.log(e);
+                        return  res.status(400).send(e);
+                });
+    });
+                        
+    legislators.write("");
+    legislators.end();
+
 });
 

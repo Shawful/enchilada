@@ -8,7 +8,7 @@ var MongoClient = require('mongodb').MongoClient
 
 server.listen(3000);
 var config = require('/opt/apps/properties/config.json');
-
+var apikey = config.sunlight_apikey;
 app.use(express.bodyParser());
 app.use(express.methodOverride());
 //app.use(express.static(__dirname + '/public'));
@@ -174,11 +174,75 @@ app.put('/user/reps', requireAuth() , function(req, res) { //IGNORE A CERTAIN BI
         });
 });
 
+// USER VOTE FOR A BILL ID ... HAS A BUG WHEN TRYING TO VOTE ON SAME BILL
+app.post('/user/bills/:billId/:vote', requireAuth(), function(req, res) {  //VOTE ON CERTAIN BILL ID
+
+    var user = req.params.user;
+    var vote = req.param('vote');
+    var billId = req.param('billId');
+    var senators = user.senators;
+    if (!vote) {
+        return res.status(400).send("vote missing");
+    }
+    if (vote == 1)
+        vote = true;
+    else
+        vote = false;
+
+    MongoClient.connect('mongodb://127.0.0.1:27017/users', function(err, db) {
+        if (err)
+            throw err;
+
+        var collection = db.collection('authentications');
+        var arrayName = "";
+        collection.update({_id: user._id}, {$addToSet: {votes: {"bill_id": billId, "vote": vote}}}, function(err, records) {
+            if (err) {
+                console.log(err);
+                return res.status(400).send("failed to record vote");
+            } else {
+                for (var i in senators) {
+                    var senator = senators[i];
+                    var options = {
+                        host: 'congress.api.sunlightfoundation.com',
+                        path: '/votes?voter_ids.' + senator.id + '__exists=true&vote_type=passage&bill_id=' + billId + '&fields=voters.' + senator.id + '.vote',
+                        method: 'GET',
+                        headers: {'x-apikey': apikey}
+                    };
+
+                    var senatorVote = http.request(options, function(response) {
+                        response.on('data', function(data) {
+                            data = JSON.parse(data);
+                            if (data.count > 0) {
+                                var biodguideId = senator.id;
+                                console.log(data.results[0].voters[biodguideId].vote);
+                                if ((vote === true && data.results[0].voters[biodguideId].vote != "Yea") ||
+                                        (vote === false && data.results[0].voters[biodguideId].vote === "Yea")) {
+                                    collection.update({_id: user._id, "senators.id": biodguideId}, {$inc : {"senators.$.disagree" : 1}}, function(err, records) {
+                                        if (err) {
+                                            console.log("Disagreement failed with  "+err);
+                                        } else {
+                                            console.log("successfully recorded disagreement");
+
+                                        }
+                                    });
+                                }
+                            }
+                        });
+                        response.on('error', function(e) {
+                            console.log(e);
+                        });
+                    });
+                    senatorVote.write("");
+                    senatorVote.end();
+                }
+                return res.send("Vote for the bill successfull");
+            }
+        });
+    });
+});
 
 
-
-
-// SAVE USER VOTE FOR A BILL ID
+//UPDATE A USER VOTE FOR A BILL ID
 app.put('/user/bills/:billId/:vote', requireAuth(), function(req, res) {  //VOTE ON CERTAIN BILL ID
 
     var user = req.params.user;
@@ -187,14 +251,17 @@ app.put('/user/bills/:billId/:vote', requireAuth(), function(req, res) {  //VOTE
     if (!vote) {
         return res.status(400).send("vote missing");
     }
+    if(vote==1)
+        vote =true;
+    else
+        vote =false;
+    
     MongoClient.connect('mongodb://127.0.0.1:27017/users', function(err, db) {
         if (err)
             throw err;
 
         var collection = db.collection('authentications');
-        var arrayName = "";
-        if (vote == true) {
-            collection.update({_id: user._id}, {$addToSet: {liked: billId}}, function(err, records) {
+        collection.update({_id: user._id ,  "votes.bill_id" : billId}, {$set :{"votes.$.vote" : vote}}, function(err, records) {
                 if (err) {
                     return res.status(400).send("failed to record vote");
                 } else {
@@ -206,35 +273,14 @@ app.put('/user/bills/:billId/:vote', requireAuth(), function(req, res) {  //VOTE
                         return res.send("Vote for the bill successfull");
                     });
 
-
                 }
-
-            });
-        }
-        else {
-            collection.update({_id: user._id}, {$addToSet: {disliked: billId}}, function(err, records) {
-                if (err) {
-                    return res.status(400).send("failed to record vote");
-                } else {
-                    collection.update({_id: user._id}, {$pull: {liked: billId}}, function(err, records) {
-                        if (err) {
-                            console.log("failed to update the bill " + billId);
-                        }
-
-                        return res.send("Vote for the bill successfull");
-                    });
-
-
-                }
-
-            });
-        }
-
-
+        });
     });
 
 });
 
+
+//GET ALL THE LIKED BILLS
 app.get('/user/bills/liked', requireAuth(), function(req, res) {
     var apikey = config.sunlight_apikey;
     var user = req.params.user;
@@ -279,6 +325,8 @@ app.get('/user/bills/liked', requireAuth(), function(req, res) {
         return res.status(200).send(user.liked);
 });
 
+
+//GET ALL THE DISLIKED BILLS
 app.get('/user/bills/disliked', requireAuth() , function(req, res) {
     var apikey = config.sunlight_apikey;
     var user = req.params.user;
@@ -324,4 +372,26 @@ app.get('/user/bills/disliked', requireAuth() , function(req, res) {
 });
 
 
+
+//CALCULATE REP WORTHINESS
+app.get('/user/reps', requireAuth() , function(req, res) {
+    var user = req.params.user;
+    var totalVoteCount = user.votes.length ;
+    
+    var senators = user.senators;
+    
+    var repWorthiness = [];
+    for(var i in senators){
+        var senator = senators[i];
+        if(totalVoteCount ==0)
+            var worthiness = 100;
+        else
+            var worthiness = ((totalVoteCount -senator.disagree)/totalVoteCount)*100;
+        
+        repWorthiness.push({"bioguide_id" : senator.id , "worthiness" : worthiness});
+    }
+    
+    return res.status(200).send(repWorthiness);
+    
+});
 

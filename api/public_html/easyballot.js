@@ -156,6 +156,15 @@ app.put('/user/zipcode/:zipcode', requireAuth() , function(req, res) { //IGNORE 
         });
 });
 
+//GETS THE SAVED ZIPCODE
+app.get('/user/zipcode', requireAuth() , function(req, res){
+    var user = req.params.user;
+    if(user.zipcode)
+        return res.status(200).send({"zipcode" : user.zipcode});
+    else
+        return res.status(404).send("Zipcode not found for user");
+});
+
 //SAVE ZIPCODE BASED REPS  Req body : ["asdasd","adasdas"]
 app.put('/user/reps', requireAuth() , function(req, res) { //IGNORE A CERTAIN BILL ID
     var user = req.params.user;

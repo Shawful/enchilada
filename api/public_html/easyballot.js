@@ -1,4 +1,5 @@
 var express = require('express');
+var cors = require('cors');
 var app = express();
 var server = require('http').createServer(app);
 var http = require('https');
@@ -7,6 +8,7 @@ var MongoClient = require('mongodb').MongoClient
         , format = require('util').format;
 var Promise = require('promise');
 
+app.use(cors());
 server.listen(3000);
 var config = require('/opt/apps/properties/config.json');
 var apikey = config.sunlight_apikey;
@@ -16,11 +18,7 @@ app.use(express.methodOverride());
 app.use(express.static(path.join(__dirname + '/public')));
 app.use(app.router);
 
-app.all('*', function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "X-Requested-With");
-  next();
- });
+
 
 
 function requireAuth() {
@@ -515,7 +513,7 @@ app.delete('/user/reps/:repId', requireAuth(), function(req, res) {
 
 });
 
-app.get('/user/zipcode/:zipcode/reps' , function(req,res){
+app.get('/zipcode/:zipcode/reps' , function(req,res){
     
     var zipcode = req.param('zipcode');
     var options = {

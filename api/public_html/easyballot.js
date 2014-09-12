@@ -659,6 +659,8 @@ app.post('/user/legislators' , function(req,res){
                         
     googleLatLong.write("");
     googleLatLong.end();
+    }else{
+        return res.status(400).send('missing zipcode and streetAddress');
     }
     
 

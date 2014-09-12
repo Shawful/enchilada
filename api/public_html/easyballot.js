@@ -601,7 +601,7 @@ app.post('/user/legislators' , function(req,res){
         
         var options = {
                 host: 'maps.googleapis.com',
-                path : '/maps/api/geocode/json?address=4705+Lake+Champlain+Lane&components=postal_code:78754&sensor=false',
+                path : '/maps/api/geocode/json?address='+jsonBody.streetAddress+'&components=postal_code:'+jsonBody.zipcode+'&sensor=false',
                 method: 'GET',
                 headers: {'key': 'AIzaSyDIvQ3yOOChwaZNj6pAh9puIOS7ukmGi0A' }
         };

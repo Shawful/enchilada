@@ -594,3 +594,72 @@ function callSunlight(options) {
 
     return promise;
 }
+
+app.post('/user/legislators' , function(req,res){
+    var jsonBody = req.body;
+    if(jsonBody.streetAddress && jsonBody.zipcode){
+        
+        var options = {
+                host: 'maps.googleapis.com',
+                path : '/maps/api/geocode/json?address=4705+Lake+Champlain+Lane&components=postal_code:78754&sensor=false',
+                method: 'GET',
+                headers: {'key': 'AIzaSyDIvQ3yOOChwaZNj6pAh9puIOS7ukmGi0A' }
+        };
+        var googleLatLong = http.request(options, function( response) {
+            var result = '';
+                response.on('data', function (chunk) {
+                        result += chunk;
+                        
+                });
+                response.on('end' , function(){
+                    var data = JSON.parse(result);
+                    var lat = data.results[0].geometry.location.lat;
+                    var long = data.results[0].geometry.location.lng;
+                    
+                    if (lat && long){
+                        var options = {
+                                    host: 'congress.api.sunlightfoundation.com',
+                                    path: '/legislators/locate/?latitude='+lat+'&longitude='+long,
+                                    method: 'GET',
+                                    headers: {'x-apikey': apikey }
+                        };
+
+                        var legislators = http.request(options, function( response) {
+                            var result ='';
+                                    response.on('data', function (chunk) {
+                                            result += chunk;
+                                    });
+                                    response.on('end', function () {
+                                            var data = JSON.parse(result);
+                                            return res.status(200).send(data);
+                                    });
+                                    response.on('error', function (e) {
+                                            console.log(e);
+                                            return  res.status(400).send(e);
+                                    });
+                        });
+
+                        legislators.write("");
+                        legislators.end();
+                        
+                        
+                    }else{
+                        return res.status(400).send('lat/lng not found');
+                    }
+                        
+                    
+                    
+                    
+                });
+                response.on('error', function (e) {
+                        console.log(e);
+                        return  res.status(400).send(e);
+                });
+        });
+                        
+    googleLatLong.write("");
+    googleLatLong.end();
+    }
+    
+
+});

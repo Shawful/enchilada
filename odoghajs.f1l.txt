@@ -1,0 +1,18 @@
+﻿Revert "automated fix push"
+
+This reverts commit 48108edd572de465d70700e311faac37c5911811.
+
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+# On branch master
+# Your branch is up-to-date with 'origin/master'.
+#
+# Changes to be committed:
+#	new file:   api/nbproject/project.properties
+#	new file:   api/nbproject/project.xml
+#	new file:   api/public_html/app.js
+#	new file:   api/public_html/index.html
+#	new file:   api/public_html/mongocommands.txt
+#	modified:   api/public_html/public/views/login.html
+#
+

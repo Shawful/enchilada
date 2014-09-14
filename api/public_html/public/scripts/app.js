@@ -59,7 +59,7 @@ app.config(['$routeProvider', '$locationProvider', function ($routeProvider, $lo
 app.run(['$rootScope', '$location', '$cookieStore', 'Auth', function ($rootScope, $location, $cookieStore, auth) {
         //$scope.$apply();
         // $rootScope.urlRoot = 'http://jarvis-dev.niwsc.com/deviceapi-2.0/rest';
-        // $rootScope.urlAuth = 'http://api-dev.niwsc.com/auth-service-1.0';
+        $rootScope.urlAuth = 'http://ec2-54-85-38-129.compute-1.amazonaws.com:3000/user/login';
         // $rootScope.urlKeyService = 'http://jarvis-dev.niwsc.com/keyservices-1.0/rest'
         // $rootScope.urlSocket = 'http://jarvis-dev.niwsc.com:80';
         

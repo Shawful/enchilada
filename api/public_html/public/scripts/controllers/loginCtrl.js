@@ -1,14 +1,16 @@
 'use strict';
 
-app.controller('loginCtrl', ['$scope', '$http', 'Auth', '$rootScope', '$injector', function (sc, http, Auth, $rootScope, $injector) {
-// app.controller('loginCtrl', ['$scope', '$http', 'Auth', function (sc, http, auth) {
+app.controller('loginCtrl', ['$scope', '$http', 'Auth', '$rootScope', '$injector', function (scope, http, Auth, $rootScope, $injector) {
+// app.controller('loginCtrl', ['$scope', '$http', 'Auth', function (scope, http, auth) {
 	    
-    sc.awesomeThings = ['HTML5 Boilerplate', 'AngularJS', 'Karma'];
+    scope.awesomeThings = ['HTML5 Boilerplate', 'AngularJS', 'Karma'];
     
     
-     sc.login = function()
+     scope.login = function()
      {
-     	$rootScope.user.username = sc.username;
+     	$rootScope.user.username = scope.username;
+     	$rootScope.user.password = scope.password;
+     	//something else that is not important...
      	Auth.login($rootScope.user, function(){}, function(){}); // function ()
    	 };
 

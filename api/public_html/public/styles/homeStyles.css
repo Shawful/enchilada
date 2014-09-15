@@ -1,0 +1,85 @@
+/* line 2, ../../app/styles/homeStyles.scss */
+
+.billPop .ng-leave {
+  -webkit-animation: fadeInLeft 1s;
+  -ms-animation: fadeInLeft 1s;
+  animation: fadeInLeft 1s;
+}
+
+/* line 10, ../../app/styles/homeStyles.scss */
+
+.billPop .ng-leave-stagger {
+  transition-delay: 0.1s;
+}
+
+/* line 13, ../../app/styles/homeStyles.scss */
+
+.billPop .ng-leave-active {
+  -webkit-animation: bounceOut 1s;
+  -ms-animation: bounceOut 1s;
+  animation: bounceOut 1s;
+}
+
+/* line 23, ../../app/styles/homeStyles.scss */
+
+.alert-container {
+  position: relative;
+}
+
+/* line 27, ../../app/styles/homeStyles.scss */
+
+.alert-fade {
+  z-index: 3;
+  position: absolute;
+  width: 300px;
+  margin-left: 10px;
+  float: left;
+}
+
+/* line 28, ../../app/styles/homeStyles.scss */
+
+.alert-fade .ng-enter {
+  -webkit-animation: fadeIn 1s;
+  -ms-animation: fadeIn 1s;
+  animation: fadeIn 1s;
+}
+
+/* line 36, ../../app/styles/homeStyles.scss */
+
+.alert-fade .ng-leave-stagger {
+  transition-delay: 0.1s;
+}
+
+/* line 39, ../../app/styles/homeStyles.scss */
+
+.alert-fade .ng-leave {
+  -webkit-animation: fadeOut 1s;
+  -ms-animation: fadeOut 1s;
+  animation: fadeOut 1s;
+}
+
+/* Add formatting for Congressmembers' pics */
+
+/* line 55, ../../app/styles/homeStyles.scss */
+
+.repworthiness {
+  text-align: center;
+  /* 37px works for double digit, 31px works for single digit */
+  display: inline;
+  color: red;
+  font-size: 18px;
+  /*text-align: center;
+  /* margin-left: (($width - $img_sz - $per_sz)/2)-1;
+  margin-right: (($width - $img_sz - $per_sz)/2)-1; */
+  font-family: Veranda;
+  -vendor-animation-duration: 0.1s;
+}
+
+/* line 74, ../../app/styles/homeStyles.scss */
+
+img {
+  margin: 5px 0px 5px 0px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}

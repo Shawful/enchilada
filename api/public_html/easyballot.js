@@ -79,7 +79,7 @@ app.post('/user',function(req,res){ //CREATE A NEW ACCOUNT
 
 
         var jsonBody = req.body;
-
+        
 
         collection.insert(jsonBody, {safe: true}, function(err, records) {
             if (err) {
@@ -108,7 +108,7 @@ app.post('/user/login',function(req,res){ //LOGIN TO THE EXISTING ACCOUNT
         var jsonBody = req.body;
 
         //FIND IF THE USERNAME AND PASSWORD EXIST
-        collection.findOne({_id : username}, function(err, result) {
+        collection.findOne({_id : username ,  "password" : password}, function(err, result) {
             if (err) {
                 return res.status(400).send("Failed");
             }

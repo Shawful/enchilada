@@ -34,11 +34,11 @@
             <div class="collapse navbar-collapse navHeaderCollapse">
                 <ul class="nav navbar-nav navbar-right">
 
-                    <li><a href="#login" ng-show="!isLoggedIn">Login</a>
+                    <li>
+                        <a href="#login" ng-show="!isLoggedIn">Login</a>
                     </li>
                     <!-- <li><a href="#login"> {{isLoggedIn}}</a></li> -->
-                    <li><a href="" ng-show="isLoggedIn" ng-click="logout()">Log out</a>
-                    </li>
+                    
                     <!-- <li class="dropdown">
                         <a class="dropdown-toggle" data-toggle="dropdown">Social Media <b class="caret"></b></a>
                         <ul class="dropdown-menu">
@@ -54,13 +54,29 @@
                     </li> -->
                     <!--  <li><a href="#">Social Media</a>
                     </li> -->
-                    <li><a href="#about" ng-show="!isLoggedIn">About</a>
+                    <li>
+                        <a href="#about" ng-show="!isLoggedIn">About</a>
                     </li>
-                    <li><a href="#contact" ng-show="isLoggedIn" data-toggle="modal">Contact Us</a>
+                    <li>
+                        <a href="#contact" ng-show="isLoggedIn" data-toggle="modal">Contact Us</a>
                     </li>
-                    <li class="active"><a href="#home" ng-show="isLoggedIn">Home</a>
+                    <li class="active">
+                        <a href="#home" ng-show="isLoggedIn">Home</a>
                     </li>
-                    <li><a href="#profile" ng-show="isLoggedIn">{{user.username}}</a>
+                    <li class="dropdown">
+                        <a ng-show="isLoggedIn" class="dropdown-toggle" data-toggle="dropdown">{{user.username}}<b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="" ng-show="isLoggedIn" ng-click="logout()">Log out</a>
+                            </li>
+                            <!-- <li>
+                                <a href='#'>Profile</a>
+                            </li> -->
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#" ></a>
+                    </li>
                     </li>
                 </ul>
             </div>

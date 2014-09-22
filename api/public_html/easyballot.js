@@ -470,7 +470,7 @@ app.post('/user/reps' , requireAuth() , function(req,res){
         }
     }
     for(var i in repArray) {
-        senatorObjects.push({"id" : repArray[i] , "disagree" : 0})
+        senatorObjects.push({"id" : repArray[i] , "disagree" : 0});
     }
     
     MongoClient.connect('mongodb://127.0.0.1:27017/users', function(err, db) {
@@ -483,6 +483,7 @@ app.post('/user/reps' , requireAuth() , function(req,res){
             if (err) {
                 return res.status(400).send("User already exists");
             }
+            calculateDisagreementsForNewlyAddedSenators(user._id , senatorObjects , user.votes);
             console.log("Record added");
             return res.send("Reps added");
         });
@@ -697,3 +698,76 @@ app.get('/bills/search', function(req, res) {  //TESTING PROMISES
     bills.end();
 
 });
+
+
+function calculateDisagreementsForNewlyAddedSenators(userId , senators , votedBills){
+    MongoClient.connect('mongodb://127.0.0.1:27017/users', function(err, db) {
+        if (err)
+            throw err;
+
+        var collection = db.collection('authentications');
+    for (var i in senators){
+        var senator = senators[i];
+        
+        for (var j in votedBills){
+            var bill = votedBills[j];
+            
+            var options = {
+                            host: 'congress.api.sunlightfoundation.com',
+                            path: '/votes?voter_ids.' + senator.id + '__exists=true&vote_type=passage&bill_id=' + bill.bill_id + '&fields=voters.' + senator.id + '.vote',
+                            method: 'GET',
+                            headers: {'x-apikey': apikey}
+            };
+            
+            var promise = callSunlightForSenatorVote(options , bill.vote);
+                    promise.then(function(result) {
+                        var data = result.data;
+                        var vote = result.vote;
+                        if (data.count > 0) {
+                            var senatorId = Object.keys(data.results[0].voters)[0]; //TO RETRIEVE KEY NAME FROM THE JSON BODY
+                            if (data.results[0].voters[senatorId]) {
+                                if ((vote === true && data.results[0].voters[senatorId].vote != "Yea") ||
+                                        (vote === false && data.results[0].voters[senatorId].vote === "Yea")) {
+                                    console.log("recording disagreement for " + senatorId);
+                                    collection.update({_id: userId, "senators.id": senatorId}, {$inc: {"senators.$.disagree": 1}}, function(err, records) {
+                                        if (err) {
+                                            console.log("Disagreement failed with  " + err);
+                                        } else {
+                                            console.log("successfully recorded disagreement");
+
+                                        }
+                                    });
+                                }
+                            }
+                        }
+
+                    }, function(error) {
+                        console.log("promise rejected with " + error);
+                });
+            
+        }
+    }
+    });
+};
+
+
+function callSunlightForSenatorVote(options , vote) {
+    var promise = new Promise(function(resolve, reject) {
+        var callVote = http.request(options, function(response) {
+
+            response.on('data', function(data) {
+                data = JSON.parse(data);
+                
+                resolve({"data" : data , "vote" : vote});
+            });
+            response.on('error', function(e) {
+                console.log(e);
+                reject(err);
+            });
+        });
+        callVote.write("");
+        callVote.end();
+    });
+
+    return promise;
+}

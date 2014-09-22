@@ -404,26 +404,16 @@ app.get('/user/bills', requireAuth(), function(req, res) {
                 headers: {'x-apikey': apikey }
             };
 
-            var bills = http.request(options, function(response) {
-                response.on('data', function(data) {
-                    data = JSON.parse(data);
-                    timelineObjects.push({"bill" : data.results[0],"vote" : bill.vote});
+            var promise = callSunlightAndStoreVote(options ,bill.vote );
+            promise.then(function(info) {
+                timelineObjects.push({"bill" : info.data.results[0] , "vote" : info.vote});
+                
+                if(timelineObjects.length === user.votes.length)
+                    return res.status(200).send(timelineObjects);
 
-                    if (billCount == user.votes.length - 1) {
-                        //console.log(timelineObjects);
-                        return res.send(timelineObjects);
-                    }
-                    billCount++;
-
-                });
-                response.on('error', function(e) {
-                    console.log(e);
-                    return  res.status(400).send(e);
-                });
+            }, function(error) {
+                    console.log("promise rejected with " + error);
             });
-            bills.write("");
-            bills.end();
-
         }
     }
     else
@@ -719,7 +709,7 @@ function calculateDisagreementsForNewlyAddedSenators(userId , senators , votedBi
                             headers: {'x-apikey': apikey}
             };
             
-            var promise = callSunlightForSenatorVote(options , bill.vote);
+            var promise = callSunlightAndStoreVote(options , bill.vote);
                     promise.then(function(result) {
                         var data = result.data;
                         var vote = result.vote;
@@ -751,7 +741,7 @@ function calculateDisagreementsForNewlyAddedSenators(userId , senators , votedBi
 };
 
 
-function callSunlightForSenatorVote(options , vote) {
+function callSunlightAndStoreVote(options , vote) {
     var promise = new Promise(function(resolve, reject) {
         var callVote = http.request(options, function(response) {
 

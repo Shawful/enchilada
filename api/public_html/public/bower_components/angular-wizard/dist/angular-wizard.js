@@ -4,6 +4,7 @@
  * @author Martin Gontovnikas <martin@gon.to>
  * @license MIT License, http://www.opensource.org/licenses/MIT
  */
+
 angular.module('templates-angularwizard', ['step.html', 'wizard.html']);
 
 angular.module("step.html", []).run(["$templateCache", function($templateCache) {

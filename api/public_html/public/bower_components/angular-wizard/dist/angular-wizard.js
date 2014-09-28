@@ -27,6 +27,8 @@ angular.module("wizard.html", []).run(["$templateCache", function($templateCache
 
 angular.module('mgo-angular-wizard', ['templates-angularwizard']);
 
+//Another directive?
+
 angular.module('mgo-angular-wizard').directive('wzStep', function() {
     return {
         restrict: 'EA',
@@ -46,6 +48,8 @@ angular.module('mgo-angular-wizard').directive('wzStep', function() {
         }
     }
 });
+
+//A third directive??? (with a controller in there too for good measure)
 
 angular.module('mgo-angular-wizard').directive('wizard', function() {
     return {
@@ -154,6 +158,9 @@ angular.module('mgo-angular-wizard').directive('wizard', function() {
     };
 });
 
+
+//Directive
+
 function wizardButtonDirective(action) {
     angular.module('mgo-angular-wizard')
         .directive(action, function() {
@@ -179,6 +186,11 @@ wizardButtonDirective('wzNext');
 wizardButtonDirective('wzPrevious');
 wizardButtonDirective('wzFinish');
 wizardButtonDirective('wzCancel');
+
+
+
+
+//Service
 
 angular.module('mgo-angular-wizard').factory('WizardHandler', function() {
    var service = {};

@@ -127,6 +127,7 @@ angular.module('mgo-angular-wizard').directive('wizard', function() {
                     this.finish();
                 } else {
                     $scope.goTo($scope.steps[index + 1]);
+                    //alert('next!');
                 }
             };
 

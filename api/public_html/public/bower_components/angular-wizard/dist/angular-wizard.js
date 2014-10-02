@@ -4,7 +4,6 @@
  * @author Martin Gontovnikas <martin@gon.to>
  * @license MIT License, http://www.opensource.org/licenses/MIT
  */
-
 angular.module('templates-angularwizard', ['step.html', 'wizard.html']);
 
 angular.module("step.html", []).run(["$templateCache",
@@ -32,6 +31,8 @@ angular.module("wizard.html", []).run(["$templateCache",
 
 angular.module('mgo-angular-wizard', ['templates-angularwizard']);
 
+//Another directive?
+
 angular.module('mgo-angular-wizard').directive('wzStep', function() {
     return {
         restrict: 'EA',
@@ -51,6 +52,8 @@ angular.module('mgo-angular-wizard').directive('wzStep', function() {
         }
     }
 });
+
+//A third directive??? (with a controller in there too for good measure)
 
 angular.module('mgo-angular-wizard').directive('wizard', function() {
     return {
@@ -139,6 +142,7 @@ angular.module('mgo-angular-wizard').directive('wizard', function() {
                     }
                 };
 
+<<<<<<< HEAD
                 this.goTo = function(step) {
                     var stepTo;
                     if (_.isNumber(step)) {
@@ -150,6 +154,20 @@ angular.module('mgo-angular-wizard').directive('wizard', function() {
                     }
                     $scope.goTo(stepTo);
                 };
+=======
+            this.next = function(draft) {
+                var index = _.indexOf($scope.steps , $scope.selectedStep);
+                if (!draft) {
+                    $scope.selectedStep.completed = true;
+                }
+                if (index === $scope.steps.length - 1) {
+                    this.finish();
+                } else {
+                    $scope.goTo($scope.steps[index + 1]);
+                    //alert('next!');
+                }
+            };
+>>>>>>> 73605301a3c3ec2ece1d3f072171307feae454a8
 
                 this.finish = function() {
                     if ($scope.onFinish) {
@@ -180,6 +198,9 @@ angular.module('mgo-angular-wizard').directive('wizard', function() {
     };
 });
 
+
+//Directive
+
 function wizardButtonDirective(action) {
     angular.module('mgo-angular-wizard')
         .directive(action, function() {
@@ -205,6 +226,11 @@ wizardButtonDirective('wzNext');
 wizardButtonDirective('wzPrevious');
 wizardButtonDirective('wzFinish');
 wizardButtonDirective('wzCancel');
+
+
+
+
+//Service
 
 angular.module('mgo-angular-wizard').factory('WizardHandler', function() {
     var service = {};

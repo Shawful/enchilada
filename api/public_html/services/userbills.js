@@ -157,3 +157,91 @@ function callSunlightAndStoreVote(options , vote) {
 
     return promise;
 }
+
+
+
+exports.voteOnABillExperiment = function(MongoClient) {
+    return function(req, res) {
+        var user = req.params.user;
+        var vote = req.param('vote');
+        var billId = req.param('billId');
+        var senators = user.senators;
+        if (!vote) {
+            return res.status(400).send("vote missing");
+        }
+        if (vote === 1)
+            vote = true;
+        else
+            vote = false;
+
+        var originalBillVote = null;
+        var userVotes = user.votes;
+        for (var iter in userVotes) {
+            if (billId === userVotes[iter]["bill_id"]) {
+                originalBillVote = userVotes[iter]["vote"];
+                if (orignalBillVote === vote)  //removing the possibility of recasting votes
+                    return res.status(200).send("No change in vote position");
+                break;
+            }
+        }
+
+        if (originalBillVote) { //for a different vote than current vote
+            MongoClient.connect('mongodb://127.0.0.1:27017/users', function(err, db) {
+               
+               collection.update({_id: user._id, "votes.bill_id": billId}, {$set: {"votes.$.vote": vote}}, function(err, records) {
+                    if (err) {
+                    console.log(err);
+                    return res.status(400).send("failed to record vote");
+                } else {
+                    for (var i in senators) {
+                        var senator = senators[i];
+                        var options = {
+                            host: 'congress.api.sunlightfoundation.com',
+                            path: '/votes?voter_ids.' + senator.id + '__exists=true&vote_type=passage&bill_id=' + billId + '&fields=voters.' + senator.id + '.vote',
+                            method: 'GET',
+                            headers: {'x-apikey': apikey}
+                        };
+
+                        var promise = callSunlight(options);
+                        promise.then(function(data) {
+                            if (data.count > 0) {
+                                var senatorId = Object.keys(data.results[0].voters)[0]; //TO RETRIEVE KEY NAME FROM THE JSON BODY
+                                if (data.results[0].voters[senatorId]) {
+                                    if ((vote === true && data.results[0].voters[senatorId].vote != "Yea") ||
+                                            (vote === false && data.results[0].voters[senatorId].vote === "Yea")) {
+                                        console.log("recording disagreement for " + senatorId);
+                                        collection.update({_id: user._id, "senators.id": senatorId}, {$inc: {"senators.$.disagree": 1}}, function(err, records) {
+                                            if (err) {
+                                                console.log("Disagreement failed with  " + err);
+                                            } else {
+                                                console.log("successfully recorded disagreement");
+
+                                            }
+                                        });
+                                    } else {
+                                        collection.update({_id: user._id, "senators.id": senatorId}, {$inc: {"senators.$.disagree": -1}}, function(err, records) {
+                                            if (err) {
+                                                console.log("Agreement failed with  " + err);
+                                            } else {
+                                                console.log("successfully recorded agreement");
+
+                                            }
+                                        });
+                                    }
+                                }
+                            }
+
+                        }, function(error) {
+                            console.log("promise rejected with " + error);
+                        });
+                    }
+                    return res.send("Vote for the bill successfull");
+                }
+               }); 
+            });
+            
+            
+            
+        }
+    };
+};

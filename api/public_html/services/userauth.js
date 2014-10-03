@@ -1,3 +1,5 @@
+var sha1 = require('sha1');
+
 exports.createNewAccount = function(MongoClient) {
     return function(req, res) {
     MongoClient.connect('mongodb://127.0.0.1:27017/users', function(err, db) {
@@ -9,7 +11,12 @@ exports.createNewAccount = function(MongoClient) {
 
         var jsonBody = req.body;
         
-
+        if(jsonBody){
+        if(!jsonBody.password)    
+            return res.status(400).send("Password is required");
+        
+        jsonBody.password = sha1(jsonBody.password);
+        
         collection.insert(jsonBody, {safe: true}, function(err, records) {
             if (err) {
                 return res.status(400).send("User already exists");
@@ -17,6 +24,8 @@ exports.createNewAccount = function(MongoClient) {
             console.log("Record added as " + records[0]._id);
             return res.send("User added");
         });
+        }else
+            return res.status(400).send("Bad data");
 
     });
     };
@@ -34,10 +43,12 @@ exports.login = function(MongoClient) {
             throw err;
 
         var collection = db.collection('authentications');
-
-
-        var jsonBody = req.body;
-
+        
+        
+        password = sha1(password);
+        
+        
+        
         //FIND IF THE USERNAME AND PASSWORD EXIST
         collection.findOne({_id : username ,  "password" : password}, function(err, result) {
             if (err) {

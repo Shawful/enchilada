@@ -25,6 +25,8 @@ var zipCodeService = require('./services/zipcode');
 var userService = require('./services/userauth');
 var userBillService = require('./services/userbills');
 var billService = require('./services/bills');
+var filterService = require('./services/filters');
+
 
 function requireAuth() {
     return function(req, res, next) {
@@ -232,3 +234,7 @@ app.get('/zipcode/:zipcode/reps', zipCodeService.findRepsByZipCode());
 app.post('/user/legislators', repService.findRepsByLatLong());
 
 app.get('/bills/search', billService.searchBills());
+
+app.post('/user/filters', requireAuth(), filterService.saveFilters());
+
+app.get('/user/filters', requireAuth(), filterService.getUserFilters() );

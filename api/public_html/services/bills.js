@@ -1,3 +1,6 @@
+var config = require('/opt/apps/properties/config.json');
+var apikey = config.sunlight_apikey;
+
 exports.searchBills = function(MongoClient) {
     return function(req, res) {
     var billSearch = req.query.bill;

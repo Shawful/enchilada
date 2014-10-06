@@ -2,6 +2,7 @@ var MongoClient = require('mongodb').MongoClient;
 var config = require('/opt/apps/properties/config.json');
 var apikey = config.sunlight_apikey;
 var http = require('https');
+var Promise = require('promise');
 
 exports.saveARep = function() {
     return function(req, res) {
@@ -54,14 +55,10 @@ exports.addReps = function() {
     var user = req.params.user;
     var reps = user.senators;
     var repArray = req.body;
+    if(repArray.length > 3 ||  repArray.length < 3)
+        return res.status(400).send('invalid number of reps');
     var senatorObjects = [];
-    for (var i in repArray) {
-        for (var j in reps) {
-            if (repArray[i] === reps[j]["id"]) {
-                return res.status(400).send("Rep "+reps[j]["id"]+" already saved ");
-            }
-        }
-    }
+    
     for(var i in repArray) {
         senatorObjects.push({"id" : repArray[i] , "disagree" : 0});
     }
@@ -71,14 +68,19 @@ exports.addReps = function() {
             throw err;
 
         var collection = db.collection('authentications');
-
-        collection.update({"_id" : user._id}, {$pushAll : {"senators" : senatorObjects} } , function(err, records) {
-            if (err) {
-                return res.status(400).send("User already exists");
+        collection.update({"_id" : user._id}, {$set : {"senators" : [] } } , function(err, records) {
+            if(err){
+                console.log("clearing reps failed with "+err);
+                 return res.status(500).send('Internal server error');  
             }
-            calculateDisagreementsForNewlyAddedSenators(user._id , senatorObjects , user.votes);
-            console.log("Record added");
-            return res.send("Reps added");
+            collection.update({"_id" : user._id}, {$pushAll : {"senators" : senatorObjects} } , function(err, records) {
+                if (err) {
+                    return res.status(400).send("User already exists");
+                }
+                calculateDisagreementsForNewlyAddedSenators(user._id , senatorObjects , user.votes);
+                console.log("Record added");
+                return res.send("Reps added");
+            });
         });
 
     });
@@ -227,3 +229,24 @@ function calculateDisagreementsForNewlyAddedSenators(userId , senators , votedBi
     }
     });
 };
+
+function callSunlightAndStoreVote(options, vote) {
+    var promise = new Promise(function(resolve, reject) {
+        var callVote = http.request(options, function(response) {
+
+            response.on('data', function(data) {
+                data = JSON.parse(data);
+
+                resolve({"data": data, "vote": vote});
+            });
+            response.on('error', function(e) {
+                console.log(e);
+                reject(err);
+            });
+        });
+        callVote.write("");
+        callVote.end();
+    });
+
+    return promise;
+}

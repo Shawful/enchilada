@@ -120,9 +120,3 @@ app.post('/user/filters', requireAuth(), filterService.saveFilters());
 app.get('/user/filters', requireAuth(), filterService.getUserFilters() );
 
 
-
-app.get('/', function(req, res) {
-    console.log(__dirname);
-    res.sendfile(__dirname + '/index.html');
-    //return res.send("hello")
-});

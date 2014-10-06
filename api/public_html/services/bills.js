@@ -1,5 +1,6 @@
 var config = require('/opt/apps/properties/config.json');
 var apikey = config.sunlight_apikey;
+var http = require('https');
 
 exports.searchBills = function(MongoClient) {
     return function(req, res) {

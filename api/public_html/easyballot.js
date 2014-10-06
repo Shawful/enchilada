@@ -109,6 +109,8 @@ app.delete('/user/reps/:repId', requireAuth(), repService.deleteARep(MongoClient
 
 app.get('/zipcode/:zipcode/reps', zipCodeService.findRepsByZipCode());
 
+app.get('/zipcode/:zipcode/viewport', zipCodeService.findViewportCoordinatesForZipcode());
+
 app.post('/user/legislators', repService.findRepsByLatLong());
 
 app.get('/bills/search', billService.searchBills());

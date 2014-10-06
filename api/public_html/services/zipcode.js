@@ -1,4 +1,5 @@
 var MongoClient = require('mongodb').MongoClient;
+var http = require('https');
 
 exports.getUserZipCode = function() {
     return function(req, res) {
@@ -48,5 +49,39 @@ exports.findRepsByZipCode = function() {
             return res.send("zipcode saved");
             });
         });
+    };
+};
+
+
+exports.findViewportCoordinatesForZipcode = function() {
+    return function(req, res) {
+     var zipcode = req.param('zipcode');
+     if(!zipcode)
+         return  res.status(400).send('zipcode not found');
+     var options = {
+                host: 'maps.googleapis.com',
+                path : '/maps/api/geocode/json?address='+zipcode,
+                method: 'GET',
+                headers: {'key': 'AIzaSyDIvQ3yOOChwaZNj6pAh9puIOS7ukmGi0A' }
+        };
+        var googleLatLong = http.request(options, function( response) {
+            var result = '';
+                response.on('data', function (chunk) {
+                        result += chunk;
+                        
+                });
+                response.on('end' , function(){
+                    var data = JSON.parse(result);
+                    var viewport = data.results[0].geometry.viewport;
+                    return  res.status(200).send(viewport);
+                });
+                response.on('error', function (e) {
+                        console.log(e);
+                        return  res.status(400).send(e);
+                });
+        });
+                        
+    googleLatLong.write("");
+    googleLatLong.end();
     };
 };

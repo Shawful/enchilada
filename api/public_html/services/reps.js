@@ -114,7 +114,7 @@ exports.findRepsByLatLong = function() {
         
         var options = {
                 host: 'maps.googleapis.com',
-                path : '/maps/api/geocode/json?address='+jsonBody.streetAddress+'&components=postal_code:'+jsonBody.zipcode+'&sensor=false',
+                path : '/maps/api/geocode/json?address='+encodeURIComponent(jsonBody.streetAddress)+'&components=postal_code:'+jsonBody.zipcode+'&sensor=false',
                 method: 'GET',
                 headers: {'key': 'AIzaSyDIvQ3yOOChwaZNj6pAh9puIOS7ukmGi0A' }
         };

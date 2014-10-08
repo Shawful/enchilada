@@ -1,5 +1,8 @@
 var MongoClient = require('mongodb').MongoClient;
 var http = require('https');
+var config = require('/opt/apps/properties/config.json');
+var apikey = config.sunlight_apikey;
+
 
 exports.getUserZipCode = function() {
     return function(req, res) {
@@ -34,21 +37,34 @@ exports.saveZipCodeForUser = function() {
 
 exports.findRepsByZipCode = function() {
     return function(req, res) {
-    var user = req.params.user;
+    
     var zipcode = req.param('zipcode');
     
-   MongoClient.connect('mongodb://127.0.0.1:27017/users', function(err, db) {
-        if (err)
-            throw err;
+     var options = {
+                                    host: 'congress.api.sunlightfoundation.com',
+                                    path: '/legislators/locate/?fields=bioguide_id,chamber,first_name,middle_name,state,phone,last_name&zip='+zipcode,
+                                    method: 'GET',
+                                    headers: {'x-apikey': apikey}
+                };
+                
+             var legislators = http.request(options, function( response) {
+                            var result ='';
+                                    response.on('data', function (chunk) {
+                                            result += chunk;
+                                    });
+                                    response.on('end', function () {
+                                            var data = JSON.parse(result);
+                                            return res.status(200).send(data);
+                                    });
+                                    response.on('error', function (e) {
+                                            console.log(e);
+                                            return  res.status(400).send(e);
+                                    });
+                        });
 
-        var collection = db.collection('authentications');
-            collection.update({_id : user._id} ,{$set : { "zipcode ": zipcode}}, function(err, records) {
-            if (err) {
-                return res.status(400).send("failed to record vote");
-            }
-            return res.send("zipcode saved");
-            });
-        });
+            legislators.write("");
+            legislators.end();   
+                
     };
 };
 

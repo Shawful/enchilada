@@ -42,7 +42,7 @@ exports.findRepsByZipCode = function() {
     
      var options = {
                                     host: 'congress.api.sunlightfoundation.com',
-                                    path: '/legislators/locate/?fields=bioguide_id,chamber,first_name,middle_name,state,phone,last_name&zip='+zipcode,
+                                    path: '/legislators/locate/?fields=bioguide_id,chamber,first_name,middle_name,state,phone,last_name,district&zip='+zipcode,
                                     method: 'GET',
                                     headers: {'x-apikey': apikey}
                 };

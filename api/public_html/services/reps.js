@@ -291,8 +291,9 @@ exports.getUserRepsAsync = function() {
                                     else
                                         var worthiness = ((totalVoteCount -senator.disagree)/totalVoteCount)*100;
                                     repWorthiness.push({"first_name" : result.results[0].first_name , "last_name" : result.results[0].last_name , "bioguide_id" : senator.id ,"worthiness" : worthiness });                                    
-                                    callback();
+                                    
                                     }
+                                    callback();
                                 });
                                 response.on('error', function(e) {
                                     console.log('failed with '+error);

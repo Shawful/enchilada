@@ -271,7 +271,7 @@ exports.getUserRepsAsync = function() {
                         function(senator, callback) {
                             var options = {
                             host: 'congress.api.sunlightfoundation.com',
-                            path: 'legislators?bioguide_id=A000022',
+                            path: '/legislators?bioguide_id='+senator.id,
                             method: 'GET',
                             headers: {'x-apikey': apikey}
                             };
@@ -283,10 +283,16 @@ exports.getUserRepsAsync = function() {
                                             result += chunk;
                                 });
                                 response.on('end', function() {
-                                console.log(result);
-                                    data = JSON.parse(data);
-                                    repWorthiness.push({"first_name" : data.first_name});
-                                    callback(null, {"first_name" : data.first_name});                                    
+                                    result = JSON.parse(result);
+                                    if(result.results.length >0){
+                                    //repWorthiness.push({"first_name" : result.results[0].first_name});
+                                    if(totalVoteCount ==0)
+                                        var worthiness = 100;
+                                    else
+                                        var worthiness = ((totalVoteCount -senator.disagree)/totalVoteCount)*100;
+                                    repWorthiness.push({"first_name" : result.results[0].first_name , "last_name" : result.results[0].last_name , "bioguide_id" : senator.id ,"worthiness" : worthiness });                                    
+                                    callback();
+                                    }
                                 });
                                 response.on('error', function(e) {
                                     console.log('failed with '+error);
@@ -296,25 +302,12 @@ exports.getUserRepsAsync = function() {
                                 rep.write("");
                                 rep.end();
                         },
-                         function(err , results) {
-                                    console.log(results);
-                                    return res.status(200).send(repWorthiness);
+                         function(err) {
+                             if(err)
+                                 return res.status(400).send(err);
+                             return res.status(200).send(repWorthiness);
                          }
                     );
 
-    
-    
-    
-//    for(var i in senators){
-//        var senator = senators[i];
-//        if(totalVoteCount ==0)
-//            var worthiness = 100;
-//        else
-//            var worthiness = ((totalVoteCount -senator.disagree)/totalVoteCount)*100;
-//        
-//        repWorthiness.push({"bioguide_id" : senator.id , "worthiness" : worthiness});
-//    }
-//    
-//    return res.status(200).send(repWorthiness);
     };
 };

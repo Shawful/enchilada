@@ -100,7 +100,7 @@ app.get('/user/bills', requireAuth(), userBillService.getUserVotedBills());
 
 
 //CALCULATE REP WORTHINESS
-app.get('/user/reps', requireAuth(), repService.getUserReps());
+app.get('/user/reps', requireAuth(), repService.getUserRepsAsync());
 
 //SAVE ZIPCODE BASED REPS  Req body : ["asdasd","adasdas"]
 app.put('/user/reps', requireAuth(), repService.saveARep(MongoClient));

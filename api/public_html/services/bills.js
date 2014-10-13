@@ -13,7 +13,7 @@ exports.searchBills = function(MongoClient) {
         limit = 5;
     var options = {
                 host: 'congress.api.sunlightfoundation.com',
-                path: '/bills/search?congress=113&query="'+encodeURIComponent(billSearch)+'"&history.enacted=true&per_page='+limit,
+                path: '/bills/search?congress=113|112|111&query="'+encodeURIComponent(billSearch)+'"&history.enacted=true&per_page='+limit,
                 method: 'GET',
                 headers: {'x-apikey': apikey }
     };

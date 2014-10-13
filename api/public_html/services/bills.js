@@ -75,3 +75,42 @@ exports.getBillSummary = function() {
     };
 };
 
+exports.getRecentBills = function() {
+    return function(req, res) {
+    
+    var limit = req.query.per_page ;
+    
+    if(!limit)
+        limit = 20;
+    var options = {
+                host: 'congress.api.sunlightfoundation.com',
+                path: '/bills?order=last_action_at&per_page='+limit,
+                method: 'GET',
+                headers: {'x-apikey': apikey }
+    };
+    
+    var bills = http.request(options, function( response) {
+        
+               var result ='';
+                response.on('data', function (chunk) {
+                        result += chunk;
+                });
+                response.on('end', function () {
+                        var data = JSON.parse(result);
+                        return res.status(200).send(data);
+                });
+                response.on('error', function (e) {
+                        console.log(e);
+                        return  res.status(400).send(e);
+                });
+    });
+                        
+    bills.write("");
+    bills.end();
+
+    };
+};
+
+
+
+

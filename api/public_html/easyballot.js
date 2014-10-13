@@ -26,7 +26,7 @@ var userService = require('./services/userauth');
 var userBillService = require('./services/userbills');
 var billService = require('./services/bills');
 var filterService = require('./services/filters');
-
+var emailService = require('./services/email');
 
 function requireAuth() {
     return function(req, res, next) {
@@ -117,8 +117,11 @@ app.post('/user/legislators', repService.findRepsByLatLong());
 
 app.get('/bills/search', billService.searchBills());
 
+app.get('/bills/summary/:billId', billService.getBillSummary());
+
+app.get('/bills/recent', billService.getRecentBills());
+
 app.post('/user/filters', requireAuth(), filterService.saveFilters());
 
 app.get('/user/filters', requireAuth(), filterService.getUserFilters() );
-
 

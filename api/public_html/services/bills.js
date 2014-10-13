@@ -13,16 +13,20 @@ exports.searchBills = function(MongoClient) {
         limit = 5;
     var options = {
                 host: 'congress.api.sunlightfoundation.com',
-                path: '/bills/search?congress=113|112|111&query="'+encodeURIComponent(billSearch)+'"&history.enacted=true&per_page='+limit,
+                path: '/bills/search?congress__in=113|112|111&query="'+encodeURIComponent(billSearch)+'"&history.enacted=true&per_page='+limit,
                 method: 'GET',
                 headers: {'x-apikey': apikey }
     };
     
     var bills = http.request(options, function( response) {
-                response.on('data', function (data) {
-                        data = JSON.parse(data);
-                        
-                        return res.status(200).send(data.results);
+        
+               var result ='';
+                response.on('data', function (chunk) {
+                        result += chunk;
+                });
+                response.on('end', function () {
+                        var data = JSON.parse(result);
+                        return res.status(200).send(data);
                 });
                 response.on('error', function (e) {
                         console.log(e);
@@ -53,7 +57,7 @@ exports.getBillSummary = function() {
     };
     
     var bill = http.request(options, function( response) {
-            
+                
                 response.on('data', function (data) {
                         data = JSON.parse(data);
                         

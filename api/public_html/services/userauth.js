@@ -1,6 +1,9 @@
 var sha1 = require('sha1');
-
-exports.createNewAccount = function(MongoClient) {
+var uuid = require('node-uuid');
+var MongoClient = require('mongodb').MongoClient
+        , format = require('util').format;
+        
+exports.createNewAccount = function() {
     return function(req, res) {
     MongoClient.connect('mongodb://127.0.0.1:27017/users', function(err, db) {
         if (err)
@@ -17,6 +20,11 @@ exports.createNewAccount = function(MongoClient) {
         
         jsonBody.password = sha1(jsonBody.password);
         
+        //adding verification rules
+        jsonBody.verificationToken = uuid.v1();
+        jsonBody.verified = false;
+        
+        
         collection.insert(jsonBody, {safe: true}, function(err, records) {
             if (err) {
                 return res.status(400).send("User already exists");
@@ -31,7 +39,7 @@ exports.createNewAccount = function(MongoClient) {
     };
 };
 
-exports.login = function(MongoClient) {
+exports.login = function() {
     return function(req, res) {
         var username  = req.headers['x-username'];
     var password  = req.headers['x-password'];
@@ -50,7 +58,7 @@ exports.login = function(MongoClient) {
         
         
         //FIND IF THE USERNAME AND PASSWORD EXIST
-        collection.findOne({_id : username ,  "password" : password}, function(err, result) {
+        collection.findOne({_id : username ,  "password" : password , "verified" : true}, function(err, result) {
             if (err) {
                 return res.status(400).send("Failed");
             }
@@ -75,5 +83,44 @@ exports.login = function(MongoClient) {
         });
 
     });
+    };
+};
+
+
+exports.verify = function(){
+    return function(req, res) {
+        var verificationCode = req.param('code');
+        if(!verificationCode)
+            return res.status(400).send("Verification code is missing");
+        MongoClient.connect('mongodb://127.0.0.1:27017/users', function(err, db) {
+            if (err)
+            throw err;
+
+            var collection = db.collection('authentications');
+            collection.findOne({"verificationToken" : verificationCode}, function(err, result) {
+                if (err) {
+                    return res.status(400).send("Failed");
+                }
+                if(result == null){
+                    return res.status(404).send("Invalid verification code");
+                }
+                
+                if(result.verified){
+                    return res.status(404).send("Invalid verification code");
+                }
+                else{
+                    collection.update({"verificationToken" : verificationCode},{$set :{"verified" : true , "verificationToken" : ""} } , function(err, docsUpdated){
+                        if (err) {
+                            return res.status(500).send("Internal server error");
+                        }
+                        
+                        console.log("number of records updated during verification : "+docsUpdated);
+                        return res.status(200).send("User verified"); 
+                    });
+                }
+                
+                
+            });
+        });    
     };
 };

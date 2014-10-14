@@ -26,7 +26,7 @@ var userService = require('./services/userauth');
 var userBillService = require('./services/userbills');
 var billService = require('./services/bills');
 var filterService = require('./services/filters');
-
+var emailService = require('./services/email');
 
 function requireAuth() {
     return function(req, res, next) {
@@ -76,9 +76,11 @@ app.get('/', function(req, res) {
     //return res.send("hello")
 });
 
-app.post('/user', userService.createNewAccount(MongoClient));
+app.post('/user', userService.createNewAccount());
 
-app.post('/user/login', userService.login(MongoClient));
+app.post('/user/login', userService.login());
+app.post('/user/verify/:code', userService.verify());
+
 
 //SAVE USER ZIP CODE
 app.put('/user/zipcode/:zipcode', requireAuth(), zipCodeService.saveZipCodeForUser(MongoClient));
@@ -98,7 +100,7 @@ app.get('/user/bills', requireAuth(), userBillService.getUserVotedBills());
 
 
 //CALCULATE REP WORTHINESS
-app.get('/user/reps', requireAuth(), repService.getUserReps());
+app.get('/user/reps', requireAuth(), repService.getUserRepsAsync());
 
 //SAVE ZIPCODE BASED REPS  Req body : ["asdasd","adasdas"]
 app.put('/user/reps', requireAuth(), repService.saveARep(MongoClient));
@@ -115,8 +117,11 @@ app.post('/user/legislators', repService.findRepsByLatLong());
 
 app.get('/bills/search', billService.searchBills());
 
+app.get('/bills/summary/:billId', billService.getBillSummary());
+
+app.get('/bills/recent', billService.getRecentBills());
+
 app.post('/user/filters', requireAuth(), filterService.saveFilters());
 
 app.get('/user/filters', requireAuth(), filterService.getUserFilters() );
-
 

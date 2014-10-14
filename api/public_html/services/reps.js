@@ -3,6 +3,8 @@ var config = require('/opt/apps/properties/config.json');
 var apikey = config.sunlight_apikey;
 var http = require('https');
 var Promise = require('promise');
+var async = require('async');
+
 
 exports.saveARep = function() {
     return function(req, res) {
@@ -250,3 +252,63 @@ function callSunlightAndStoreVote(options, vote) {
 
     return promise;
 }
+
+
+exports.getUserRepsAsync = function() {
+    return function(req, res) {
+    var user = req.params.user;
+    if(user.votes)
+        var totalVoteCount = user.votes.length ;
+    else
+        var totalVoteCount = 0;
+    var senators = user.senators;
+    
+    var repWorthiness = [];
+    
+    
+        async.eachSeries(senators,
+                
+                        function(senator, callback) {
+                            var options = {
+                            host: 'congress.api.sunlightfoundation.com',
+                            path: '/legislators?bioguide_id='+senator.id,
+                            method: 'GET',
+                            headers: {'x-apikey': apikey}
+                            };
+                            console.log('processing '+senator.id);
+                            
+                            var rep = http.request(options, function(response) {
+                                var result ='';
+                                    response.on('data', function (chunk) {
+                                            result += chunk;
+                                });
+                                response.on('end', function() {
+                                    result = JSON.parse(result);
+                                    if(result.results.length >0){
+                                    //repWorthiness.push({"first_name" : result.results[0].first_name});
+                                    if(totalVoteCount ==0)
+                                        var worthiness = 100;
+                                    else
+                                        var worthiness = ((totalVoteCount -senator.disagree)/totalVoteCount)*100;
+                                    repWorthiness.push({"first_name" : result.results[0].first_name , "last_name" : result.results[0].last_name , "bioguide_id" : senator.id ,"worthiness" : worthiness });                                    
+                                    
+                                    }
+                                    callback();
+                                });
+                                response.on('error', function(e) {
+                                    console.log('failed with '+error);
+                                        callback(err,null);
+                                    });
+                                });
+                                rep.write("");
+                                rep.end();
+                        },
+                         function(err) {
+                             if(err)
+                                 return res.status(400).send(err);
+                             return res.status(200).send(repWorthiness);
+                         }
+                    );
+
+    };
+};

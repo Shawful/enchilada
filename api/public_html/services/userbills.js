@@ -241,6 +241,15 @@ exports.voteOnABillExperiment = function() {
                                                 });
                                             }
                                         }
+                                    }else{
+                                        collection.update({_id: user._id, "senators.id": senatorId}, {$inc: {"senators.$.novote": 1}}, function(err, records) {
+                                                    if (err) {
+                                                        console.log("Disagreement failed with  " + err);
+                                                    } else {
+                                                        console.log("successfully recorded disagreement");
+
+                                                    }
+                                            });
                                     }
 
                                 }, function(error) {
@@ -301,6 +310,15 @@ exports.voteOnABillExperiment = function() {
                                                 });
                                             }
                                         }
+                                    }else{
+                                        collection.update({_id: user._id, "senators.id": senatorId}, {$inc: {"senators.$.novote": 1}}, function(err, records) {
+                                                    if (err) {
+                                                        console.log("Disagreement failed with  " + err);
+                                                    } else {
+                                                        console.log("successfully recorded disagreement");
+
+                                                    }
+                                            });
                                     }
 
                                 }, function(error) {

@@ -284,11 +284,18 @@ exports.getUserRepsAsync = function() {
                                 response.on('end', function() {
                                     result = JSON.parse(result);
                                     if(result.results.length >0){
-                                    //repWorthiness.push({"first_name" : result.results[0].first_name});
+                                    var worthiness ;
                                     if(totalVoteCount ==0)
-                                        var worthiness = 100;
-                                    else
-                                        var worthiness = ((totalVoteCount -senator.disagree)/totalVoteCount)*100;
+                                        worthiness = 100;
+                                    else{
+                                        if(senator.novote){
+                                            totalVoteCount = totalVoteCount - senator.novote;
+                                        }
+                                        if(totalVoteCount == 0 ) //avoid divide by 0
+                                            worthiness = 0;
+                                        else
+                                            worthiness = ((totalVoteCount -senator.disagree)/totalVoteCount)*100;
+                                    }
                                     repWorthiness.push({"first_name" : result.results[0].first_name , "last_name" : result.results[0].last_name , "bioguide_id" : senator.id ,"worthiness" : worthiness });                                    
                                     
                                     }

@@ -8,12 +8,12 @@
 
 <head>
     <meta charset="utf-8">
-    <title>EasyBallot</title>
+    <title>EasyBallot.org</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width">
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
     <link rel="stylesheet" href="styles/76cae95d.vendor.css">
-    <link rel="stylesheet" href="styles/8baec91f.main.css">
+    <link rel="stylesheet" href="styles/f548e874.main.css">
 </head>
 
 <body ng-app="politicheckApp">
@@ -38,7 +38,7 @@
                         <a href="#login" ng-show="!isLoggedIn">Login</a>
                     </li>
                     <!-- <li><a href="#login"> {{isLoggedIn}}</a></li> -->
-                    
+
                     <!-- <li class="dropdown">
                         <a class="dropdown-toggle" data-toggle="dropdown">Social Media <b class="caret"></b></a>
                         <ul class="dropdown-menu">
@@ -75,7 +75,7 @@
                         </ul>
                     </li>
                     <li>
-                        <a href="#" ></a>
+                        <a href="#"></a>
                     </li>
                     </li>
                 </ul>
@@ -83,73 +83,69 @@
         </div>
     </div>
 
-<!-- Alerts Section -->
-<div class="alert-container" >
-    <div class="alert-fade">
-        <alert ng-repeat="alert in alerts" type="success" close="closeAlert($index)">{{ alert.msg }}</alert>
+    <!-- Alerts Section -->
+    <div class="alert-container">
+        <div class="alert-fade">
+            <alert ng-repeat="alert in alerts" type="success" close="closeAlert($index)">{{ alert.msg }}</alert>
+        </div>
     </div>
-</div>
 
 </body>
 
 
-    <!-- <<<<<<<<<<<<<<<<<<<<<<<   Add your site or application content here >>>>>>>>>>>>>>>>>>>>>>-->
-    <div class="container" ng-view="">
-        <div ui-view>
-        </div>
+<!-- <<<<<<<<<<<<<<<<<<<<<<<   Add your site or application content here >>>>>>>>>>>>>>>>>>>>>>-->
+<div class="container" ng-view="">
+    <div ui-view>
     </div>
-    <!-- <<<<<<<<<<<<<<<<<<<<<<<<<<  Central View >>>>>>>>>>>>>>>>>>>>>>>>>>> -->
+</div>
+<!-- <<<<<<<<<<<<<<<<<<<<<<<<<<  Central View >>>>>>>>>>>>>>>>>>>>>>>>>>> -->
 
 
 
-    <!-- footer -->
-    <div class="navbar navbar-inverse navbar-fixed-bottom">
-        <!-- the container keeps things centered -->
-        <div class="container">
-            <!-- <p class="navbar-text pull-left">Site Built By Shawn S.haw</p> -->
-            <p class="navbar-text pull-right">EasyBallot LLC. All Rights Reserved.</p>
-            <!-- <a href="#" class="navbar-btn btn-danger btn pull-right">Subscribe on YouTube</a> -->
-        </div>
+<!-- footer -->
+<div class="navbar navbar-inverse navbar-fixed-bottom">
+    <!-- the container keeps things centered -->
+    <div class="container">
+        <!-- <p class="navbar-text pull-left">Site Built By Shawn S.haw</p> -->
+        <p class="navbar-text pull-right">EasyBallot LLC. All Rights Reserved.</p>
+        <!-- <a href="#" class="navbar-btn btn-danger btn pull-right">Subscribe on YouTube</a> -->
     </div>
+</div>
 
 
 
 
 
 <!-- Modal -->
-<div class="modal fade" id="contact" role="dialog">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form class="form-horizontal" action="">
-                <div class="modal-header">
-                    <h4>Contact Us</h4>
-                </div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label for="contact-name" class="col-lg-2 control-label">Name:</label>
-                        <div class="col-lg-10">
-                            <input type="text" class="form-control" id="contact-name" placeholder="Full Name">
+<div ng-controller="contactCtrl">
+    <div class="modal fade" id="contact" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form class="form-horizontal" action="">
+                    <div class="modal-header">
+                        <h4>Contact Us</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="contact-email" class="col-lg-2 control-label">Subject:</label>
+                            <div class="col-lg-10">
+                                <input type="text" class="form-control" id="contact-email" placeholder="LOVE this site!">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="contact-message" class="col-lg-2 control-label">Message:</label>
+                            <div class="col-lg-10">
+                                <textarea placeholder="Enter Message Here..." class="form-control" name="" id="" cols="30" rows="5"></textarea>
+                            </div>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label for="contact-email" class="col-lg-2 control-label">Email:</label>
-                        <div class="col-lg-10">
-                            <input type="text" class="form-control" id="contact-email" placeholder="you@example.com">
-                        </div>
+                    <div class="modal-footer">
+                        <a class="btn btn-default" data-dismiss="modal">Close</a>
+                        <button class="btn btn-primary" type="submit" data-dismiss="modal" ng-click="sendEmailToAdmin(user.username)">Send Message</button>
+                        <!-- <a class="btn btn-primary" data-dismiss="modal" href="#">Send Message</a> -->
                     </div>
-                    <div class="form-group">
-                        <label for="contact-message" class="col-lg-2 control-label">Message:</label>
-                        <div class="col-lg-10">
-                            <textarea class="form-control" name="" id="" cols="30" rows="5"></textarea>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <a class="btn btn-default" data-dismiss="modal">Close</a>
-                    <button class="btn btn-primary" type="submit" data-dismiss="modal">Send Message</button>
-                    <!-- <a class="btn btn-primary" data-dismiss="modal" href="#">Send Message</a> -->
-                </div>
-            </form>
+                </form>
+            </div>
         </div>
     </div>
 </div>
@@ -163,7 +159,7 @@
         (i[r].q = i[r].q || []).push(arguments)
     }, i[r].l = 1 * new Date();
     a = s.createElement(o),
-    m = s.getElementsByTagName(o)[0];
+        m = s.getElementsByTagName(o)[0];
     a.async = 1;
     a.src = g;
     m.parentNode.insertBefore(a, m)
@@ -178,9 +174,9 @@ ga('send', 'pageview');
     <script src="bower_components/json3/lib/json3.min.js"></script>
     <![endif]-->
 
-<script src="scripts/ccc30c09.vendor.js"></script>
+<script src="scripts/b97d0b13.vendor.js"></script>
 
-<script src="scripts/1160bd4f.scripts.js"></script>
+<script src="scripts/6a97bb8f.scripts.js"></script>
 
 <!-- JSON files until Server is up and running are stored in the "json" folder -->
 <!-- Current Calls -->

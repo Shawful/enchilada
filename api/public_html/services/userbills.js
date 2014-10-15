@@ -346,6 +346,7 @@ exports.clearBills = function() {
     if(reps){
         for(var i in reps){
             reps[i].disagree = 0;
+            reps[i].novote = 0;
         }
     }
    MongoClient.connect('mongodb://127.0.0.1:27017/users', function(err, db) {

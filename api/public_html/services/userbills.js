@@ -242,11 +242,12 @@ exports.voteOnABillExperiment = function() {
                                             }
                                         }
                                     }else{
+                                        console.log("recording novote");
                                         collection.update({_id: user._id, "senators.id": senatorId}, {$inc: {"senators.$.novote": 1}}, function(err, records) {
                                                     if (err) {
                                                         console.log("Disagreement failed with  " + err);
                                                     } else {
-                                                        console.log("successfully recorded disagreement");
+                                                        console.log("successfully recorded novote");
 
                                                     }
                                             });

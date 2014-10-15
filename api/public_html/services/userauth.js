@@ -41,9 +41,11 @@ exports.createNewAccount = function() {
 
 exports.login = function() {
     return function(req, res) {
-        var username  = req.headers['x-username'];
+    var username  = req.headers['x-username'];
     var password  = req.headers['x-password'];
-    if(username == null || password == null){
+    var rememberme = req.headers['x-rememberme'];
+    
+    if(username === null || password === null){
         res.status(400).send("Username and password required");
     }
     MongoClient.connect('mongodb://127.0.0.1:27017/users', function(err, db) {
@@ -69,7 +71,12 @@ exports.login = function() {
             var token = Math.random().toString(36).slice(2);
             
             var currentTime = Date.now();
-            var expiry = currentTime+86400000; //adding a day to the current
+            var expiry ;
+            if(rememberme)
+                expiry = currentTime+(86400000*7); //adding 7 days to the current
+            else
+                expiry = currentTime+86400000; //adding a day to the current
+            
             var tokenCollection = db.collection("tokens");
             
             tokenCollection.insert({_id : token ,"user_id" : username , "expiry" : expiry},{safe: true},

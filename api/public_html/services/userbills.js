@@ -333,7 +333,7 @@ exports.clearBills = function() {
                 return res.status(400).send("failed to record vote");
             }
             
-            return res.send("filters saved");
+            return res.send("bills reset");
             });
         });
     };

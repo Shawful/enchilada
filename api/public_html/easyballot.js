@@ -91,7 +91,7 @@ app.get('/user/zipcode', requireAuth(), zipCodeService.getUserZipCode());
 
 
 // USER VOTE FOR A BILL ID ... HAS A BUG WHEN TRYING TO VOTE ON SAME BILL
-app.post('/user/bills/:billId/:vote', requireAuth(), userBillService.voteOnABillExperiment(MongoClient));
+app.post('/user/bills/:billId/:vote', requireAuth(), userBillService.voteOnABillExperiment());
 
 
 
@@ -125,3 +125,4 @@ app.post('/user/filters', requireAuth(), filterService.saveFilters());
 
 app.get('/user/filters', requireAuth(), filterService.getUserFilters() );
 
+app.post('/reset' , requireAuth() , userBillService.clearBills());

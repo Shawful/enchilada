@@ -2,8 +2,11 @@ var Promise = require('promise');
 var config = require('/opt/apps/properties/config.json');
 var apikey = config.sunlight_apikey;
 var http = require('https');
-
-exports.voteOnABill = function(MongoClient) {
+var MongoClient = require('mongodb').MongoClient
+        , format = require('util').format;
+        
+        
+exports.voteOnABill = function() {
     return function(req, res) {
         var user = req.params.user;
         var vote = req.param('vote');
@@ -82,7 +85,7 @@ exports.voteOnABill = function(MongoClient) {
     };
 };
 
-exports.getUserVotedBills = function(MongoClient) {
+exports.getUserVotedBills = function() {
     return function(req, res) {
 
         var apikey = config.sunlight_apikey;
@@ -160,7 +163,7 @@ function callSunlightAndStoreVote(options, vote) {
 
 
 
-exports.voteOnABillExperiment = function(MongoClient) {
+exports.voteOnABillExperiment = function() {
     return function(req, res) {
         var user = req.params.user;
         var vote = req.param('vote');
@@ -210,7 +213,7 @@ exports.voteOnABillExperiment = function(MongoClient) {
                                     if (data.count > 0) {
                                         var senatorId = Object.keys(data.results[0].voters)[0]; //TO RETRIEVE KEY NAME FROM THE JSON BODY
                                         if (data.results[0].voters[senatorId]) {
-                                            if ((vote === true && data.results[0].voters[senatorId].vote != "Yea") ||
+                                            if ((vote === true && data.results[0].voters[senatorId].vote !== "Yea") ||
                                                     (vote === false && data.results[0].voters[senatorId].vote === "Yea")) {  // recording disagreement
                                                 console.log("recording disagreement for " + senatorId);
                                                 collection.update({_id: user._id, "senators.id": senatorId}, {$inc: {"senators.$.disagree": 1}}, function(err, records) {
@@ -279,7 +282,7 @@ exports.voteOnABillExperiment = function(MongoClient) {
 
                                         if (data.results[0].voters[senatorId]) {
 
-                                            if ((vote === true && data.results[0].voters[senatorId].vote != "Yea") ||
+                                            if ((vote === true && data.results[0].voters[senatorId].vote !== "Yea") ||
                                                     (vote === false && data.results[0].voters[senatorId].vote === "Yea")) {
                                                 console.log("recording disagreement for " + senatorId);
                                                 collection.update({_id: user._id, "senators.id": senatorId}, {$inc: {"senators.$.disagree": 1}}, function(err, records) {
@@ -306,4 +309,32 @@ exports.voteOnABillExperiment = function(MongoClient) {
             }
         }
     ;
+};
+
+
+
+
+exports.clearBills = function() {
+    return function(req, res) {
+    var user = req.params.user;
+    var reps = user.senators;
+    if(reps){
+        for(var i in reps){
+            reps[i].disagree = 0;
+        }
+    }
+   MongoClient.connect('mongodb://127.0.0.1:27017/users', function(err, db) {
+        if (err)
+            throw err;
+
+        var collection = db.collection('authentications');
+            collection.update({_id : user._id} ,{$set:{"votes" : [] , "senators" : reps}}, function(err, records) {
+            if (err) {
+                return res.status(400).send("failed to record vote");
+            }
+            
+            return res.send("filters saved");
+            });
+        });
+    };
 };

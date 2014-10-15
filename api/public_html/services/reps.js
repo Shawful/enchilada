@@ -275,7 +275,6 @@ exports.getUserRepsAsync = function() {
                             method: 'GET',
                             headers: {'x-apikey': apikey}
                             };
-                            console.log('processing '+senator.id);
                             
                             var rep = http.request(options, function(response) {
                                 var result ='';

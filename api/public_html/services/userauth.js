@@ -64,14 +64,14 @@ exports.login = function() {
             if (err) {
                 return res.status(400).send("Failed");
             }
-            if(result == null){
+            if(result === null){
                 return res.status(404).send("username/password incorrect");
             }
             
             var token = Math.random().toString(36).slice(2);
             
             var currentTime = Date.now();
-            var expiry ;
+            var expiry;
             if(rememberme)
                 expiry = currentTime+(86400000*7); //adding 7 days to the current
             else

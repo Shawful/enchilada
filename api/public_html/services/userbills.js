@@ -179,10 +179,12 @@ exports.voteOnABillExperiment = function() {
             vote = false;
         
             var originalBillVote = null;
+            var flagToRecast = false;
             var userVotes = user.votes;
             for (var iter in userVotes) { 
                 //check if the bill has been voted earlier from the vote historu
                 if (billId === userVotes[iter]["bill_id"]) {
+                    flagToRecast = true;
                     originalBillVote = userVotes[iter]["vote"];
                     console.log("current vote : "+vote);
                     console.log("historical vote : "+originalBillVote);
@@ -193,7 +195,7 @@ exports.voteOnABillExperiment = function() {
                 }
             }
 
-            if (originalBillVote) { //for a different vote than current vote .. USER CHANGING VOTE ON A BILL
+            if (flagToRecast) { //for a different vote than current vote .. USER CHANGING VOTE ON A BILL
                 console.log("modifying the vote postion");
                 MongoClient.connect('mongodb://127.0.0.1:27017/users', function(err, db) {
                     var collection = db.collection('authentications');

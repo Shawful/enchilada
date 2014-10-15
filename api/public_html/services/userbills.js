@@ -173,17 +173,20 @@ exports.voteOnABillExperiment = function() {
             return res.status(400).send("vote missing");
         }
         console.log(vote);
-        if (vote == '1')
+        if (vote === '1')
             vote = true;
         else 
             vote = false;
         
             var originalBillVote = null;
             var userVotes = user.votes;
-            for (var iter in userVotes) {
+            for (var iter in userVotes) { 
+                //check if the bill has been voted earlier from the vote historu
                 if (billId === userVotes[iter]["bill_id"]) {
                     originalBillVote = userVotes[iter]["vote"];
-                    console.log(vote);
+                    console.log("current vote : "+vote);
+                    console.log("historical vote : "+originalBillVote);
+                    
                     if (originalBillVote === vote)  //removing the possibility of recasting votes
                         return res.status(200).send("No change in vote position");
                     break;
@@ -225,6 +228,7 @@ exports.voteOnABillExperiment = function() {
                                                     }
                                                 });
                                             } else {
+                                                console.log("recording agreement for " + senatorId);
                                                 collection.update({_id: user._id, "senators.id": senatorId}, {$inc: {"senators.$.disagree": -1}}, function(err, records) {
                                                     if (err) {
                                                         console.log("Agreement failed with  " + err);
@@ -336,5 +340,179 @@ exports.clearBills = function() {
             return res.send("bills reset");
             });
         });
+    };
+};
+
+
+
+exports.voteOnABillExperimentAsync = function() {
+    return function(req, res) {
+        var user = req.params.user;
+        var vote = req.param('vote');
+        var billId = req.param('billId');
+        var senators = user.senators;
+        if (!vote) {
+            return res.status(400).send("vote missing");
+        }
+        console.log(vote);
+        if (vote === '1')
+            vote = true;
+        else
+            vote = false;
+
+        var originalBillVote = null;
+        var userVotes = user.votes;
+        for (var iter in userVotes) {
+            if (billId === userVotes[iter]["bill_id"]) {
+                originalBillVote = userVotes[iter]["vote"];
+                console.log(vote);
+                if (originalBillVote === vote)  //removing the possibility of recasting votes
+                    return res.status(200).send("No change in vote position");
+                break;
+            }
+        }
+
+        if (originalBillVote) { //changing the vote
+            console.log("modifying the vote postion");
+            MongoClient.connect('mongodb://127.0.0.1:27017/users', function(err, db) {
+                var collection = db.collection('authentications');
+                collection.update({_id: user._id, "votes.bill_id": billId}, {$set: {"votes.$.vote": vote}}, function(err, records) {
+                    if (err) {
+                        console.log(err);
+                        return res.status(400).send("failed to record vote");
+                    }
+                    
+                    async.eachSeries(senators,
+                            function(senator, callback) {
+                                var options = {
+                                    host: 'congress.api.sunlightfoundation.com',
+                                    path: '/votes?voter_ids.' + senator.id + '__exists=true&vote_type=passage&bill_id=' + billId + '&fields=voters.' + senator.id + '.vote',
+                                    method: 'GET',
+                                    headers: {'x-apikey': apikey}
+                                };
+
+                                var rep = http.request(options, function(response) {
+                                    var result = '';
+                                    response.on('data', function(chunk) {
+                                        result += chunk;
+                                    });
+                                    response.on('end', function() {
+                                        var data = JSON.parse(result);
+                                        if (data.count > 0) {
+
+                                            if (data.results[0].voters[senator.id]) {
+                                                if ((vote === true && data.results[0].voters[senator.id].vote !== "Yea") ||
+                                                        (vote === false && data.results[0].voters[senator.id].vote === "Yea")) {  // recording disagreement
+
+                                                    collection.update({_id: user._id, "senators.id": senator.id}, {$inc: {"senators.$.disagree": 1}}, function(err, records) {
+                                                        if (err) {
+                                                            console.log("Disagreement failed with  " + err);
+                                                        } else {
+                                                            console.log("successfully recorded disagreement for " + senator.id + " on bill " + billId);
+
+                                                        }
+                                                    });
+                                                } else {
+                                                    collection.update({_id: user._id, "senators.id": senatorId}, {$inc: {"senators.$.disagree": -1}}, function(err, records) {
+                                                        if (err) {
+                                                            console.log("Agreement failed with  " + err);
+                                                        } else {
+                                                            console.log("successfully recorded agreement for " + senator.id + " on bill " + billId);
+
+                                                        }
+                                                    });
+                                                }
+                                            }
+                                        }
+                                        callback();
+                                    });
+                                    response.on('error', function(e) {
+                                        console.log('failed with ' + error);
+                                        callback(err, null);
+                                    });
+                                });
+                                rep.write("");
+                                rep.end();
+                            },
+                            function(err) {
+                                if (err)
+                                    return res.status(400).send(err);
+                                return res.status(200).send("Vote saved");
+                            }
+                    );
+                });
+            });
+
+        } else {
+            console.log("Saving a new bill vote");
+            MongoClient.connect('mongodb://127.0.0.1:27017/users', function(err, db) {
+                var collection = db.collection('authentications');
+                collection.update({_id: user._id}, {$addToSet: {votes: {"bill_id": billId, "vote": vote}}}, function(err, records) {
+                    if (err) {
+                        console.log(err);
+                        return res.status(400).send("failed to record vote");
+                    }
+                    
+                    async.eachSeries(senators,
+                            function(senator, callback) {
+                                var options = {
+                                    host: 'congress.api.sunlightfoundation.com',
+                                    path: '/votes?voter_ids.' + senator.id + '__exists=true&vote_type=passage&bill_id=' + billId + '&fields=voters.' + senator.id + '.vote',
+                                    method: 'GET',
+                                    headers: {'x-apikey': apikey}
+                                };
+
+                                var rep = http.request(options, function(response) {
+                                    var result = '';
+                                    response.on('data', function(chunk) {
+                                        result += chunk;
+                                    });
+                                    response.on('end', function() {
+                                        var data = JSON.parse(result);
+                                        if (data.count > 0) {
+
+                                            if (data.results[0].voters[senator.id]) {
+                                                if ((vote === true && data.results[0].voters[senator.id].vote !== "Yea") ||
+                                                        (vote === false && data.results[0].voters[senator.id].vote === "Yea")) {  // recording disagreement
+
+                                                    collection.update({_id: user._id, "senators.id": senator.id}, {$inc: {"senators.$.disagree": 1}}, function(err, records) {
+                                                        if (err) {
+                                                            console.log("Disagreement failed with  " + err);
+                                                        } else {
+                                                            console.log("successfully recorded disagreement for " + senator.id + " on bill " + billId);
+
+                                                        }
+                                                    });
+                                                } else {
+                                                    collection.update({_id: user._id, "senators.id": senatorId}, {$inc: {"senators.$.disagree": -1}}, function(err, records) {
+                                                        if (err) {
+                                                            console.log("Agreement failed with  " + err);
+                                                        } else {
+                                                            console.log("successfully recorded agreement for " + senator.id + " on bill " + billId);
+
+                                                        }
+                                                    });
+                                                }
+                                            }
+                                        }
+                                        callback();
+                                    });
+                                    response.on('error', function(e) {
+                                        console.log('failed with ' + error);
+                                        callback(err, null);
+                                    });
+                                });
+                                rep.write("");
+                                rep.end();
+                            },
+                            function(err) {
+                                if (err)
+                                    return res.status(400).send(err);
+                                return res.status(200).send("Vote saved");
+                            }
+                    );
+                });
+            });
+        }
     };
 };

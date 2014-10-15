@@ -317,7 +317,7 @@ exports.voteOnABillExperiment = function() {
                                                     if (err) {
                                                         console.log("Disagreement failed with  " + err);
                                                     } else {
-                                                        console.log("successfully recorded disagreement");
+                                                        console.log("successfully recorded novote "+records);
 
                                                     }
                                             });

@@ -4,8 +4,8 @@ var apikey = config.sunlight_apikey;
 var http = require('https');
 var MongoClient = require('mongodb').MongoClient
         , format = require('util').format;
-        
-        
+
+
 exports.voteOnABill = function() {
     return function(req, res) {
         var user = req.params.user;
@@ -175,165 +175,166 @@ exports.voteOnABillExperiment = function() {
         console.log(vote);
         if (vote === '1')
             vote = true;
-        else 
+        else
             vote = false;
-        
-            var originalBillVote = null;
-            var flagToRecast = false;
-            var userVotes = user.votes;
-            for (var iter in userVotes) { 
-                //check if the bill has been voted earlier from the vote historu
-                if (billId === userVotes[iter]["bill_id"]) {
-                    flagToRecast = true;
-                    originalBillVote = userVotes[iter]["vote"];
-                    console.log("current vote : "+vote);
-                    console.log("historical vote : "+originalBillVote);
-                    
-                    if (originalBillVote === vote)  //removing the possibility of recasting votes
-                        return res.status(200).send("No change in vote position");
-                    break;
-                }
-            }
 
-            if (flagToRecast) { //for a different vote than current vote .. USER CHANGING VOTE ON A BILL
-                console.log("modifying the vote postion");
-                MongoClient.connect('mongodb://127.0.0.1:27017/users', function(err, db) {
-                    var collection = db.collection('authentications');
-                    collection.update({_id: user._id, "votes.bill_id": billId}, {$set: {"votes.$.vote": vote}}, function(err, records) {
-                        if (err) {
-                            console.log(err);
-                            return res.status(400).send("failed to record vote");
-                        } else {
-                            for (var i in senators) {
-                                var senator = senators[i];
-                                var options = {
-                                    host: 'congress.api.sunlightfoundation.com',
-                                    path: '/votes?voter_ids.' + senator.id + '__exists=true&vote_type=passage&bill_id=' + billId + '&fields=voters.' + senator.id + '.vote',
-                                    method: 'GET',
-                                    headers: {'x-apikey': apikey}
-                                };
+        var originalBillVote = null;
+        var flagToRecast = false;
+        var userVotes = user.votes;
+        for (var iter in userVotes) {
+            //check if the bill has been voted earlier from the vote historu
+            if (billId === userVotes[iter]["bill_id"]) {
+                flagToRecast = true;
+                originalBillVote = userVotes[iter]["vote"];
+                console.log("current vote : " + vote);
+                console.log("historical vote : " + originalBillVote);
 
-                                var promise = callSunlight(options);
-                                promise.then(function(data) {
-                                    if (data.count > 0) {
-                                        var senatorId = Object.keys(data.results[0].voters)[0]; //TO RETRIEVE KEY NAME FROM THE JSON BODY
-                                        if (data.results[0].voters[senatorId]) {
-                                            if ((vote === true && data.results[0].voters[senatorId].vote !== "Yea") ||
-                                                    (vote === false && data.results[0].voters[senatorId].vote === "Yea")) {  // recording disagreement
-                                                console.log("recording disagreement for " + senatorId);
-                                                collection.update({_id: user._id, "senators.id": senatorId}, {$inc: {"senators.$.disagree": 1}}, function(err, records) {
-                                                    if (err) {
-                                                        console.log("Disagreement failed with  " + err);
-                                                    } else {
-                                                        console.log("successfully recorded disagreement");
-
-                                                    }
-                                                });
-                                            } else {
-                                                console.log("recording agreement for " + senatorId);
-                                                collection.update({_id: user._id, "senators.id": senatorId}, {$inc: {"senators.$.disagree": -1}}, function(err, records) {
-                                                    if (err) {
-                                                        console.log("Agreement failed with  " + err);
-                                                    } else {
-                                                        console.log("successfully recorded agreement");
-
-                                                    }
-                                                });
-                                            }
-                                        }
-                                    }else{
-                                        console.log("recording novote");
-                                        collection.update({_id: user._id, "senators.id": senatorId}, {$inc: {"senators.$.novote": 1}}, function(err, records) {
-                                                    if (err) {
-                                                        console.log("Disagreement failed with  " + err);
-                                                    } else {
-                                                        console.log("successfully recorded novote "+records);
-
-                                                    }
-                                            });
-                                    }
-
-                                }, function(error) {
-                                    console.log("promise rejected with " + error);
-                                });
-                            }
-                            return res.send("Vote for the bill successfull");
-                        }
-                    });
-                });
-
-
-
-            } else { ///RECORDING A NEW BILL VOTE FOR THE USER
-                console.log("recording the new vote postion");
-                MongoClient.connect('mongodb://127.0.0.1:27017/users', function(err, db) {
-                    if (err)
-                        throw err;
-
-                    var collection = db.collection('authentications');
-                    var arrayName = "";
-                    collection.update({_id: user._id}, {$addToSet: {votes: {"bill_id": billId, "vote": vote}}}, function(err, records) {
-                        if (err) {
-                            console.log(err);
-                            return res.status(400).send("failed to record vote");
-                        } else {
-                            for (var i in senators) {
-                                var senator = senators[i];
-                                var bioguideId = senator.id;
-
-                                var options = {
-                                    host: 'congress.api.sunlightfoundation.com',
-                                    path: '/votes?voter_ids.' + bioguideId + '__exists=true&vote_type=passage&bill_id=' + billId + '&fields=voters.' + bioguideId + '.vote',
-                                    method: 'GET',
-                                    headers: {'x-apikey': apikey}
-                                };
-
-
-                                var promise = callSunlight(options, bioguideId);
-                                promise.then(function(data) {
-
-                                    if (data.count > 0) {
-                                        var senatorId = Object.keys(data.results[0].voters)[0]; //TO RETRIEVE KEY NAME FROM THE JSON BODY
-
-
-                                        if (data.results[0].voters[senatorId]) {
-
-                                            if ((vote === true && data.results[0].voters[senatorId].vote !== "Yea") ||
-                                                    (vote === false && data.results[0].voters[senatorId].vote === "Yea")) {
-                                                console.log("recording disagreement for " + senatorId);
-                                                collection.update({_id: user._id, "senators.id": senatorId}, {$inc: {"senators.$.disagree": 1}}, function(err, records) {
-                                                    if (err) {
-                                                        console.log("Disagreement failed with  " + err);
-                                                    } else {
-                                                        console.log("successfully recorded disagreement");
-
-                                                    }
-                                                });
-                                            }
-                                        }
-                                    }else{
-                                        console.log('recording novote');
-                                        collection.update({_id: user._id, "senators.id": senatorId}, {$inc: {"senators.$.novote": 1}}, function(err, records) {
-                                                    if (err) {
-                                                        console.log("Disagreement failed with  " + err);
-                                                    } else {
-                                                        console.log("successfully recorded novote "+records);
-
-                                                    }
-                                            });
-                                    }
-
-                                }, function(error) {
-                                    console.log("promise rejected with " + error);
-                                });
-
-                            }
-                            return res.send("Vote for the bill successfull");
-                        }
-                    });
-                });
+                if (originalBillVote === vote)  //removing the possibility of recasting votes
+                    return res.status(200).send("No change in vote position");
+                break;
             }
         }
+
+        if (flagToRecast) { //for a different vote than current vote .. USER CHANGING VOTE ON A BILL
+            console.log("modifying the vote postion");
+            MongoClient.connect('mongodb://127.0.0.1:27017/users', function(err, db) {
+                var collection = db.collection('authentications');
+                collection.update({_id: user._id, "votes.bill_id": billId}, {$set: {"votes.$.vote": vote}}, function(err, records) {
+                    if (err) {
+                        console.log(err);
+                        return res.status(400).send("failed to record vote");
+                    } else {
+                        for (var i in senators) {
+                            var senator = senators[i];
+                            var options = {
+                                host: 'congress.api.sunlightfoundation.com',
+                                path: '/votes?voter_ids.' + senator.id + '__exists=true&vote_type=passage&bill_id=' + billId + '&fields=voters.' + senator.id + '.vote',
+                                method: 'GET',
+                                headers: {'x-apikey': apikey}
+                            };
+
+                            var promise = callSunlight(options);
+                            promise.then(function(data) {
+                                if (data.count > 0) {
+                                    var senatorId = Object.keys(data.results[0].voters)[0]; //TO RETRIEVE KEY NAME FROM THE JSON BODY
+                                    if (data.results[0].voters[senatorId]) {
+                                        if ((vote === true && data.results[0].voters[senatorId].vote !== "Yea") ||
+                                                (vote === false && data.results[0].voters[senatorId].vote === "Yea")) {  // recording disagreement
+                                            console.log("recording disagreement for " + senatorId);
+                                            collection.update({_id: user._id, "senators.id": senatorId}, {$inc: {"senators.$.disagree": 1}}, function(err, records) {
+                                                if (err) {
+                                                    console.log("Disagreement failed with  " + err);
+                                                } else {
+                                                    console.log("successfully recorded disagreement");
+
+                                                }
+                                            });
+                                        } else {
+                                            console.log("recording agreement for " + senatorId);
+                                            collection.update({_id: user._id, "senators.id": senatorId}, {$inc: {"senators.$.disagree": -1}}, function(err, records) {
+                                                if (err) {
+                                                    console.log("Agreement failed with  " + err);
+                                                } else {
+                                                    console.log("successfully recorded agreement");
+
+                                                }
+                                            });
+                                        }
+                                    }
+                                } else {
+                                    console.log("recording novote");
+                                    collection.update({_id: user._id, "senators.id": senatorId}, {$inc: {"senators.$.novote": 1}}, function(err, records) {
+                                        if (err) {
+                                            console.log("Disagreement failed with  " + err);
+                                        } else {
+                                            console.log("successfully recorded novote " + records);
+
+                                        }
+                                    });
+                                }
+
+                            }, function(error) {
+                                console.log("promise rejected with " + error);
+                            });
+                        }
+                        return res.send("Vote for the bill successfull");
+                    }
+                });
+            });
+
+
+
+        } else { ///RECORDING A NEW BILL VOTE FOR THE USER
+            console.log("recording the new vote postion");
+            MongoClient.connect('mongodb://127.0.0.1:27017/users', function(err, db) {
+                if (err)
+                    throw err;
+
+                var collection = db.collection('authentications');
+                var arrayName = "";
+                collection.update({_id: user._id}, {$addToSet: {votes: {"bill_id": billId, "vote": vote}}}, function(err, records) {
+                    if (err) {
+                        console.log(err);
+                        return res.status(400).send("failed to record vote");
+                    } else {
+                        for (var i in senators) {
+                            var senator = senators[i];
+                            var bioguideId = senator.id;
+
+                            var options = {
+                                host: 'congress.api.sunlightfoundation.com',
+                                path: '/votes?voter_ids.' + bioguideId + '__exists=true&vote_type=passage&bill_id=' + billId + '&fields=voters.' + bioguideId + '.vote',
+                                method: 'GET',
+                                headers: {'x-apikey': apikey}
+                            };
+
+
+                            var promise = callSunlight(options, bioguideId);
+                            promise.then(function(data) {
+
+                                if (data.count > 0) {
+                                    var senatorId = Object.keys(data.results[0].voters)[0]; //TO RETRIEVE KEY NAME FROM THE JSON BODY
+
+
+                                    if (data.results[0].voters[senatorId]) {
+
+                                        if ((vote === true && data.results[0].voters[senatorId].vote !== "Yea") ||
+                                                (vote === false && data.results[0].voters[senatorId].vote === "Yea")) {
+                                            console.log("recording disagreement for " + senatorId);
+                                            collection.update({_id: user._id, "senators.id": senatorId}, {$inc: {"senators.$.disagree": 1}}, function(err, records) {
+                                                if (err) {
+                                                    console.log("Disagreement failed with  " + err);
+                                                } else {
+                                                    console.log("successfully recorded disagreement");
+
+                                                }
+                                            });
+                                        }
+                                    }
+                                } else {
+                                    console.log('recording novote');
+                                    console.log(senatorId);
+                                    collection.update({_id: user._id, "senators.id": senatorId}, {$inc: {"senators.$.novote": 1}}, function(err, records) {
+                                        if (err) {
+                                            console.log("Disagreement failed with  " + err);
+                                        } else {
+                                            console.log("successfully recorded novote " + records);
+
+                                        }
+                                    });
+                                }
+
+                            }, function(error) {
+                                console.log("promise rejected with " + error);
+                            });
+
+                        }
+                        return res.send("Vote for the bill successfull");
+                    }
+                });
+            });
+        }
+    }
     ;
 };
 
@@ -342,25 +343,25 @@ exports.voteOnABillExperiment = function() {
 
 exports.clearBills = function() {
     return function(req, res) {
-    var user = req.params.user;
-    var reps = user.senators;
-    if(reps){
-        for(var i in reps){
-            reps[i].disagree = 0;
-            reps[i].novote = 0;
-        }
-    }
-   MongoClient.connect('mongodb://127.0.0.1:27017/users', function(err, db) {
-        if (err)
-            throw err;
-
-        var collection = db.collection('authentications');
-            collection.update({_id : user._id} ,{$set:{"votes" : [] , "senators" : reps}}, function(err, records) {
-            if (err) {
-                return res.status(400).send("failed to record vote");
+        var user = req.params.user;
+        var reps = user.senators;
+        if (reps) {
+            for (var i in reps) {
+                reps[i].disagree = 0;
+                reps[i].novote = 0;
             }
-            
-            return res.send("bills reset");
+        }
+        MongoClient.connect('mongodb://127.0.0.1:27017/users', function(err, db) {
+            if (err)
+                throw err;
+
+            var collection = db.collection('authentications');
+            collection.update({_id: user._id}, {$set: {"votes": [], "senators": reps}}, function(err, records) {
+                if (err) {
+                    return res.status(400).send("failed to record vote");
+                }
+
+                return res.send("bills reset");
             });
         });
     };
@@ -384,18 +385,19 @@ exports.voteOnABillExperimentAsync = function() {
             vote = false;
 
         var originalBillVote = null;
+        var flagToRecast = false;
         var userVotes = user.votes;
         for (var iter in userVotes) {
             if (billId === userVotes[iter]["bill_id"]) {
+                flagToRecast = true;
                 originalBillVote = userVotes[iter]["vote"];
-                console.log(vote);
                 if (originalBillVote === vote)  //removing the possibility of recasting votes
                     return res.status(200).send("No change in vote position");
                 break;
             }
         }
 
-        if (originalBillVote) { //changing the vote
+        if (flagToRecast) { //changing the vote
             console.log("modifying the vote postion");
             MongoClient.connect('mongodb://127.0.0.1:27017/users', function(err, db) {
                 var collection = db.collection('authentications');
@@ -404,7 +406,7 @@ exports.voteOnABillExperimentAsync = function() {
                         console.log(err);
                         return res.status(400).send("failed to record vote");
                     }
-                    
+
                     async.eachSeries(senators,
                             function(senator, callback) {
                                 var options = {
@@ -445,6 +447,15 @@ exports.voteOnABillExperimentAsync = function() {
                                                         }
                                                     });
                                                 }
+                                            } else {
+                                                collection.update({_id: user._id, "senators.id": senatorId}, {$inc: {"senators.$.novote": 1}}, function(err, records) {
+                                                    if (err) {
+                                                        console.log("Disagreement failed with  " + err);
+                                                    } else {
+                                                        console.log("successfully recorded novote " + records);
+
+                                                    }
+                                                });
                                             }
                                         }
                                         callback();
@@ -475,7 +486,7 @@ exports.voteOnABillExperimentAsync = function() {
                         console.log(err);
                         return res.status(400).send("failed to record vote");
                     }
-                    
+
                     async.eachSeries(senators,
                             function(senator, callback) {
                                 var options = {
@@ -507,7 +518,7 @@ exports.voteOnABillExperimentAsync = function() {
                                                         }
                                                     });
                                                 } else {
-                                                    collection.update({_id: user._id, "senators.id": senatorId}, {$inc: {"senators.$.disagree": -1}}, function(err, records) {
+                                                    collection.update({_id: user._id, "senators.id": senator.id}, {$inc: {"senators.$.disagree": -1}}, function(err, records) {
                                                         if (err) {
                                                             console.log("Agreement failed with  " + err);
                                                         } else {
@@ -517,6 +528,15 @@ exports.voteOnABillExperimentAsync = function() {
                                                     });
                                                 }
                                             }
+                                        } else {
+                                            collection.update({_id: user._id, "senators.id": senator.id}, {$inc: {"senators.$.novote": 1}}, function(err, records) {
+                                                if (err) {
+                                                    console.log("Disagreement failed with  " + err);
+                                                } else {
+                                                    console.log("successfully recorded novote " + records);
+
+                                                }
+                                            });
                                         }
                                         callback();
                                     });

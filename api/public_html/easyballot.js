@@ -27,6 +27,8 @@ var userBillService = require('./services/userbills');
 var billService = require('./services/bills');
 var filterService = require('./services/filters');
 var emailService = require('./services/email');
+var contactService = require('./services/contact');
+
 
 function requireAuth() {
     return function(req, res, next) {
@@ -126,3 +128,5 @@ app.post('/user/filters', requireAuth(), filterService.saveFilters());
 app.get('/user/filters', requireAuth(), filterService.getUserFilters() );
 
 app.post('/reset' , requireAuth() , userBillService.clearBills());
+
+app.post('/contact' , requireAuth() , contactService.sendFeedBack());

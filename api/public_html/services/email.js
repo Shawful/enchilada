@@ -28,3 +28,23 @@ exports.sendVerificationEmail = function(email,verificationCode) {
 
 };
 
+
+exports.sendContactUsInfoToAdministrators= function(contact){
+    var nodemailer = require('nodemailer');
+    var transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: config.contactUsEmail,
+            pass: config.contactUsEmailPassword
+        }
+    });
+    var emailBody = "<h4>Sender</h4>  : "+contact.email+" <br>\n\ <h4>Subject</h4>: "+contact.subject+" <br> <h4>Body</h4> : "+contact.body; 
+                     
+                     
+    transporter.sendMail({
+        from: config.contactUsEmail,
+        to: config.contactUsEmail,
+        subject: 'Feedback',
+        html: emailBody
+    });
+};

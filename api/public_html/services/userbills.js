@@ -4,6 +4,7 @@ var apikey = config.sunlight_apikey;
 var http = require('https');
 var MongoClient = require('mongodb').MongoClient
         , format = require('util').format;
+var async = require('async');
 
 exports.getUserVotedBills = function() {
     return function(req, res) {

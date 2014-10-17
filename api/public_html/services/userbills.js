@@ -359,7 +359,7 @@ exports.voteOnABillExperimentAsync = function() {
                                                         }
                                                     });
                                                 } else if(((vote === true && data.results[0].voters[senator.id].vote === "Yea") ||
-                                                        (vote === false && data.results[0].voters[senator.id].vote === "Yea"))   ) {
+                                                        (vote === false && data.results[0].voters[senator.id].vote === "Nay"))   ) {
                                                     collection.update({_id: user._id, "senators.id": senator.id}, {$inc: {"senators.$.disagree": -1}}, function(err, records) {
                                                         if (err) {
                                                             console.log("Agreement failed with  " + err);

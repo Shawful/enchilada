@@ -358,7 +358,8 @@ exports.voteOnABillExperimentAsync = function() {
 
                                                         }
                                                     });
-                                                } else {
+                                                } else if(((vote === true && data.results[0].voters[senator.id].vote === "Yea") ||
+                                                        (vote === false && data.results[0].voters[senator.id].vote === "Yea"))   ) {
                                                     collection.update({_id: user._id, "senators.id": senatorId}, {$inc: {"senators.$.disagree": -1}}, function(err, records) {
                                                         if (err) {
                                                             console.log("Agreement failed with  " + err);
@@ -438,16 +439,18 @@ exports.voteOnABillExperimentAsync = function() {
 
                                                         }
                                                     });
-                                                } else {
-                                                    collection.update({_id: user._id, "senators.id": senator.id}, {$inc: {"senators.$.disagree": -1}}, function(err, records) {
-                                                        if (err) {
-                                                            console.log("Agreement failed with  " + err);
-                                                        } else {
-                                                            console.log("successfully recorded agreement for " + senator.id + " on bill " + billId);
-
-                                                        }
-                                                    });
-                                                }
+                                                } 
+//                                                else if(((vote === true && data.results[0].voters[senator.id].vote === "Yea") ||
+//                                                        (vote === false && data.results[0].voters[senator.id].vote === "Yea")) &&(senator.disagree > 0)  ){
+//                                                    collection.update({_id: user._id, "senators.id": senator.id}, {$inc: {"senators.$.disagree": -1}}, function(err, records) {
+//                                                        if (err) {
+//                                                            console.log("Agreement failed with  " + err);
+//                                                        } else {
+//                                                            console.log("successfully recorded agreement for " + senator.id + " on bill " + billId);
+//
+//                                                        }
+//                                                    });
+//                                                }
                                             }
                                         } else {
                                             collection.update({_id: user._id, "senators.id": senator.id}, {$inc: {"senators.$.novote": 1}}, function(err, records) {

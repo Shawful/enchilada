@@ -360,7 +360,7 @@ exports.voteOnABillExperimentAsync = function() {
                                                     });
                                                 } else if(((vote === true && data.results[0].voters[senator.id].vote === "Yea") ||
                                                         (vote === false && data.results[0].voters[senator.id].vote === "Yea"))   ) {
-                                                    collection.update({_id: user._id, "senators.id": senatorId}, {$inc: {"senators.$.disagree": -1}}, function(err, records) {
+                                                    collection.update({_id: user._id, "senators.id": senator.id}, {$inc: {"senators.$.disagree": -1}}, function(err, records) {
                                                         if (err) {
                                                             console.log("Agreement failed with  " + err);
                                                         } else {
@@ -370,7 +370,7 @@ exports.voteOnABillExperimentAsync = function() {
                                                     });
                                                 }
                                             } else {
-                                                collection.update({_id: user._id, "senators.id": senatorId}, {$inc: {"senators.$.novote": 1}}, function(err, records) {
+                                                collection.update({_id: user._id, "senators.id": senator.id}, {$inc: {"senators.$.novote": 1}}, function(err, records) {
                                                     if (err) {
                                                         console.log("Disagreement failed with  " + err);
                                                     } else {

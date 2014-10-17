@@ -69,7 +69,7 @@ function requireAuth() {
         else
             return res.status(403).send("no x-auth");
 
-    }
+    };
 }
 
 app.get('/', function(req, res) {

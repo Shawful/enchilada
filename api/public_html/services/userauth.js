@@ -2,7 +2,8 @@ var sha1 = require('sha1');
 var uuid = require('node-uuid');
 var MongoClient = require('mongodb').MongoClient
         , format = require('util').format;
-        
+var emailService = require('../services/email');
+
 exports.createNewAccount = function() {
     return function(req, res) {
     MongoClient.connect('mongodb://127.0.0.1:27017/users', function(err, db) {
@@ -30,6 +31,7 @@ exports.createNewAccount = function() {
                 return res.status(400).send("User already exists");
             }
             console.log("Record added as " + records[0]._id);
+            emailService.sendVerificationEmail(records[0]._id,jsonBody.verificationToken)
             return res.send("User added");
         });
         }else

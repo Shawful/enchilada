@@ -2,7 +2,8 @@ var sha1 = require('sha1');
 var uuid = require('node-uuid');
 var MongoClient = require('mongodb').MongoClient
         , format = require('util').format;
-var emailService = require('../services/email');
+var config = require('/opt/apps/properties/config.json');
+var postmark = require("postmark")(config.postmarkApiEb);
 
 exports.createNewAccount = function() {
     return function(req, res) {
@@ -31,7 +32,7 @@ exports.createNewAccount = function() {
                 return res.status(400).send("User already exists");
             }
             console.log("Record added as " + records[0]._id);
-            emailService.sendVerificationEmail(records[0]._id,jsonBody.verificationToken)
+            sendVerificationEmail(records[0]._id,jsonBody.verificationToken);
             return res.send("User added");
         });
         }else
@@ -132,4 +133,32 @@ exports.verify = function(){
             });
         });    
     };
+};
+
+var sendVerificationEmail = function(email,verificationCode) {
+    
+        var link ="ec2-54-85-38-129.compute-1.amazonaws.com:3000/#/user/verify/"+verificationCode;
+        var emailBody = "Hi Easyballot user,<br><br>\n\
+                Please click the link below to get the account verified.<br><br>\n\
+                <a href='"+link+"'>verify email</a> <br><br>\n\
+                Thank you,<br>\n\
+                Easyballot Support team";
+
+        postmark.send({
+            "From": "support@easyballot.org",
+            "To": email,
+            "Subject": "Activation email from Easyballot",
+            "HtmlBody": emailBody
+
+        }, function(error, success) {
+            if (error) {
+                console.error("Unable to send via postmark: " + error.message);
+                return;
+            }
+            console.info("Sent to postmark for delivery");
+            return;
+            
+        });
+
+    
 };

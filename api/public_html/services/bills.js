@@ -91,12 +91,16 @@ exports.getRecentBills = function() {
     return function(req, res) {
     
     var limit = req.query.per_page ;
-    
+    var limit = req.query.per_page ;
+    var page = req.query.page;
+    if(!page)
+        page =1;
     if(!limit)
-        limit = 20;
+        limit = 5;
+   
     var options = {
                 host: 'congress.api.sunlightfoundation.com',
-                path: '/bills?order=last_action_at&per_page='+limit,
+                path: '/bills?order=last_action_at&per_page='+limit+'&page='+page,
                 method: 'GET',
                 headers: {'x-apikey': apikey }
     };

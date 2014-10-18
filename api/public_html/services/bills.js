@@ -15,7 +15,7 @@ exports.searchBills = function(MongoClient) {
     if(!limit)
         limit = 5;
     
-    var re = '(hr|s)[0-9]';
+    var re = (hr|s)[0-9];
     var billPath;
     if(!re.test(billSearch))
         billPath = '/bills/search?congress__in=113|112|111&query="'+encodeURIComponent(billSearch)+'"&history.enacted=true&per_page='+limit+"&page="+page

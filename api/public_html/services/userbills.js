@@ -348,11 +348,10 @@ exports.voteOnABillExperimentAsync = function() {
 
                                             if (data.results[0].voters[senator.id]) {
                                                 
-                                                if ((vote === true && data.results[0].voters[senator.id].vote !== "Yea") ||
+                                                if ((vote === true && data.results[0].voters[senator.id].vote === "Nay") ||
                                                     (vote === false && data.results[0].voters[senator.id].vote === "Yea")
                                                     ) {  // recording disagreement
-                                                      console.log(data.results[0].voters[senator.id].vote);      
-                                                    collection.update({_id: user._id, "senators.id": senator.id}, {$inc: {"senators.$.disagree": 1}}, function(err, records) {
+                                                       collection.update({_id: user._id, "senators.id": senator.id}, {$inc: {"senators.$.disagree": 1}}, function(err, records) {
                                                         if (err) {
                                                             console.log("Disagreement failed with  " + err);
                                                         } else {

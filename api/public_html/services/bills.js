@@ -20,7 +20,7 @@ exports.searchBills = function(MongoClient) {
     if(!re.test(billSearch))
         billPath = '/bills/search?congress__in=113|112|111&query="'+encodeURIComponent(billSearch)+'"&history.enacted=true&per_page='+limit+"&page="+page
     else
-        billPath = '/bills/search?bill_id=' + billSearch + '&fields=bill_id,official_title,short_title' ;       
+        billPath = '/bills/search?bill_id=' + billSearch + '-113&fields=bill_id,official_title,short_title' ;       
     console.log("page : "+page);
     console.log("per_page : "+limit);
     var options = {

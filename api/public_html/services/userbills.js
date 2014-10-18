@@ -347,8 +347,11 @@ exports.voteOnABillExperimentAsync = function() {
                                         if (data.count > 0) {
 
                                             if (data.results[0].voters[senator.id]) {
+                                                
                                                 if ((vote === true && data.results[0].voters[senator.id].vote !== "Yea") ||
-                                                        (vote === false && data.results[0].voters[senator.id].vote === "Yea")) {  // recording disagreement
+                                                    (vote === false && data.results[0].voters[senator.id].vote === "Yea")||
+                                                    (data.results[0].voters[senator.id].vote === "Present") ||
+                                                    (data.results[0].voters[senator.id].vote === "Not Voting") ) {  // recording disagreement
 
                                                     collection.update({_id: user._id, "senators.id": senator.id}, {$inc: {"senators.$.disagree": 1}}, function(err, records) {
                                                         if (err) {
@@ -429,7 +432,9 @@ exports.voteOnABillExperimentAsync = function() {
 
                                             if (data.results[0].voters[senator.id]) {
                                                 if ((vote === true && data.results[0].voters[senator.id].vote !== "Yea") ||
-                                                        (vote === false && data.results[0].voters[senator.id].vote === "Yea")) {  // recording disagreement
+                                                        (vote === false && data.results[0].voters[senator.id].vote === "Yea") ||
+                                                    (data.results[0].voters[senator.id].vote === "Present") ||
+                                                    (data.results[0].voters[senator.id].vote === "Not Voting") ) {  // recording disagreement
 
                                                     collection.update({_id: user._id, "senators.id": senator.id}, {$inc: {"senators.$.disagree": 1}}, function(err, records) {
                                                         if (err) {
@@ -440,17 +445,7 @@ exports.voteOnABillExperimentAsync = function() {
                                                         }
                                                     });
                                                 } 
-//                                                else if(((vote === true && data.results[0].voters[senator.id].vote === "Yea") ||
-//                                                        (vote === false && data.results[0].voters[senator.id].vote === "Yea")) &&(senator.disagree > 0)  ){
-//                                                    collection.update({_id: user._id, "senators.id": senator.id}, {$inc: {"senators.$.disagree": -1}}, function(err, records) {
-//                                                        if (err) {
-//                                                            console.log("Agreement failed with  " + err);
-//                                                        } else {
-//                                                            console.log("successfully recorded agreement for " + senator.id + " on bill " + billId);
-//
-//                                                        }
-//                                                    });
-//                                                }
+//                                                
                                             }
                                         } else {
                                             collection.update({_id: user._id, "senators.id": senator.id}, {$inc: {"senators.$.novote": 1}}, function(err, records) {

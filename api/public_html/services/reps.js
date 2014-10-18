@@ -258,9 +258,9 @@ exports.getUserRepsAsync = function() {
     return function(req, res) {
     var user = req.params.user;
     if(user.votes)
-        var totalVoteCount = user.votes.length ;
+        var userVoteCount = user.votes.length;
     else
-        var totalVoteCount = 0;
+        var userVoteCount = 0;
     var senators = user.senators;
     
     var repWorthiness = [];
@@ -285,6 +285,7 @@ exports.getUserRepsAsync = function() {
                                     result = JSON.parse(result);
                                     if(result.results.length >0){
                                         var worthiness ;
+                                        var totalVoteCount = userVoteCount;
                                     if(senator.disagree === 0 || totalVoteCount ===0){
                                         //if disagree is 0 .. worthiness is 100
                                         // or total vote count is 0 ..

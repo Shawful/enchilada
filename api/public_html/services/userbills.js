@@ -349,9 +349,8 @@ exports.voteOnABillExperimentAsync = function() {
                                             if (data.results[0].voters[senator.id]) {
                                                 
                                                 if ((vote === true && data.results[0].voters[senator.id].vote !== "Yea") ||
-                                                    (vote === false && data.results[0].voters[senator.id].vote === "Yea")||
-                                                    (data.results[0].voters[senator.id].vote === "Present") ||
-                                                    (data.results[0].voters[senator.id].vote === "Not Voting") ) {  // recording disagreement
+                                                    (vote === false && data.results[0].voters[senator.id].vote === "Yea")
+                                                    ) {  // recording disagreement
 
                                                     collection.update({_id: user._id, "senators.id": senator.id}, {$inc: {"senators.$.disagree": 1}}, function(err, records) {
                                                         if (err) {

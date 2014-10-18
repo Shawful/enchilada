@@ -9,11 +9,14 @@ exports.searchBills = function(MongoClient) {
     if(! billSearch)
         return res.status(400).send('missing bill search text');
     var limit = req.query.per_page ;
+    var page = req.query.page;
+    if(!page)
+        page =1;
     if(!limit)
         limit = 5;
     var options = {
                 host: 'congress.api.sunlightfoundation.com',
-                path: '/bills/search?congress__in=113|112|111&query="'+encodeURIComponent(billSearch)+'"&history.enacted=true&per_page='+limit,
+                path: '/bills/search?congress__in=113|112|111&query="'+encodeURIComponent(billSearch)+'"&history.enacted=true&per_page='+limit+"&page="+page,
                 method: 'GET',
                 headers: {'x-apikey': apikey }
     };

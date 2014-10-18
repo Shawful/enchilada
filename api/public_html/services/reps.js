@@ -291,21 +291,21 @@ exports.getUserRepsAsync = function() {
                                         // or total vote count is 0 ..
                                         worthiness = 100;
                                     }else{
-                                            console.log("senator.novote : "+senator.novote);
-                                            console.log("totalVoteCount of the user : "+totalVoteCount);
+//                                            console.log("senator.novote : "+senator.novote);
+//                                            console.log("totalVoteCount of the user : "+totalVoteCount);
                                             if(senator.novote){
                                                 totalVoteCount = totalVoteCount - senator.novote;
                                                 
-                                                console.log('senator novote totalVoteCount - senator.novote : '+totalVoteCount);
+//                                                console.log('senator novote totalVoteCount - senator.novote : '+totalVoteCount);
                                             }
                                             if(totalVoteCount === 0 ) //avoid divide by 0 after subtracting novote's
                                                 worthiness = 0;
                                             else{
-                                                console.log('totalVoteCount : '+totalVoteCount );
-                                                console.log('senator.disagree : '+senator.disagree);
+//                                                console.log('totalVoteCount : '+totalVoteCount );
+//                                                console.log('senator.disagree : '+senator.disagree);
                                                 
                                                 worthiness = ((totalVoteCount - senator.disagree)/totalVoteCount)*100;
-                                                console.log('worthiness : '+worthiness );
+//                                                console.log('worthiness : '+worthiness );
                                             }
                                     }
                                         repWorthiness.push({"first_name" : result.results[0].first_name , "last_name" : result.results[0].last_name , "bioguide_id" : senator.id ,"worthiness" : worthiness });                                    

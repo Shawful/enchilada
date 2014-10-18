@@ -139,17 +139,18 @@ var sendVerificationEmail = function(email,verificationCode) {
     
         var link ="http://ec2-54-85-38-129.compute-1.amazonaws.com:3000/#/user/verify/"+verificationCode;
         console.log('sending a link '+link);
-        var emailBody = "Hi Easyballot user,<br><br>\n\
+        var emailBody = "<p>Hi Easyballot user,<br><br>\n\
                 Please click the link below to get the account verified.<br><br>\n\
-                <a href='"+link+"'>verify email</a> <br><br>\n\
+                <a href="+link+" >verify email</a> <br><br>\n\
                 Thank you,<br>\n\
-                Easyballot Support team";
+                Easyballot Support team</p>";
 
         postmark.send({
             "From": "support@easyballot.org",
             "To": email,
             "Subject": "Activation email from Easyballot",
-            "HtmlBody": "<h1> <a href="+link+">verify</a> </h1>"
+            //"HtmlBody": "<h1> <a href="+link+">verify</a> </h1>"
+            "HtmlBody": emailBody
 
         }, function(error, success) {
             if (error) {

@@ -12,8 +12,11 @@ exports.searchBills = function(MongoClient) {
     var page = req.query.page;
     if(!page)
         page =1;
+    
     if(!limit)
         limit = 5;
+    console.log("page : "+page);
+    console.log("per_page : "+limit);
     var options = {
                 host: 'congress.api.sunlightfoundation.com',
                 path: '/bills/search?congress__in=113|112|111&query="'+encodeURIComponent(billSearch)+'"&history.enacted=true&per_page='+limit+"&page="+page,

@@ -148,7 +148,7 @@ var sendVerificationEmail = function(email,verificationCode) {
             "From": "support@easyballot.org",
             "To": email,
             "Subject": "Activation email from Easyballot",
-            "HtmlBody": "<h1> <a href='link'>verify</a> </h1>"
+            "HtmlBody": "<h1> <a href='"+link+"'>verify</a> </h1>"
 
         }, function(error, success) {
             if (error) {

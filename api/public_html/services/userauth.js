@@ -138,6 +138,7 @@ exports.verify = function(){
 var sendVerificationEmail = function(email,verificationCode) {
     
         var link ="ec2-54-85-38-129.compute-1.amazonaws.com:3000/#/user/verify/"+verificationCode;
+        console.log('sending a link '+link);
         var emailBody = "Hi Easyballot user,<br><br>\n\
                 Please click the link below to get the account verified.<br><br>\n\
                 <a href='"+link+"'>verify email</a> <br><br>\n\

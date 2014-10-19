@@ -21,33 +21,48 @@ exports.getUserVotedBills = function() {
         
         var timelineObjects = [];
         if (user.votes.length > 0) {
-        var startIndex = (page -1 )* limit;
+        var startIndex = (page - 1 )* limit;
         var slicedArray = user.votes.slice(startIndex , limit);
             if(slicedArray.length === 0)
                 return res.status(200).send(slicedArray);
-            for (var i in slicedArray) {
-                var bill = user.votes[i];
+            
+            async.eachSeries(slicedArray, function(bill, callback) {
                 var options = {
                     host: 'congress.api.sunlightfoundation.com',
                     path: '/bills/search?bill_id=' + bill.bill_id + '&fields=bill_id,official_title,short_title',
                     method: 'GET',
                     headers: {'x-apikey': apikey}
                 };
-
-                var promise = callSunlightAndStoreVote(options, bill.vote);
-                promise.then(function(info) {
-                    timelineObjects.push({"bill": info.data.results[0], "vote": info.vote});
-
-                    if (timelineObjects.length === user.votes.length)
+                var callVote = http.request(options, function(response) {
+                    var result ='';
+                        response.on('data', function (chunk) {
+                                result += chunk;
+                        });
+                        response.on('end', function () {
+                               var data = JSON.parse(result);
+                               if(data.count > 0 ) 
+                                timelineObjects.push({"bill": data.results[0], "uservote": bill.vote, "voted_at" : bill.voted_at} );
+                               callback();
+                        });
+                        response.on('error', function (e) {
+                                console.log(e);
+                                callback(e);
+                        });
+                        });
+                callVote.write("");
+                callVote.end();
+            },
+                    function(err) {
+                        if (err)
+                            return res.status(400).send(err);
                         return res.status(200).send(timelineObjects);
-
-                }, function(error) {
-                    console.log("promise rejected with " + error);
-                });
-            }
+                    }
+            );
+            
+            
         }
         else
-            return res.status(200).send('Voted on no bills');
+            return res.status(200).send(timelineObjects);
     };
 };
 

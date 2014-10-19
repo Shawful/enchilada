@@ -25,7 +25,15 @@
     <!-- Nav Bar -->
     <div class="navbar navbar-inverse">
         <div class="container" ng-controller="navCtrl">
-            <a href="#" class="navbar-brand"><i class="fa fa-flag fa-1x"></i>  EasyBallot.org</a>
+            <span>
+                <a href="#">
+                    <!-- <i class="fa fa-flag fa-1x"></i> -->
+                <span>
+                    <image class="pull-left" ng-src="../images/logo/check.png" width="40" height="40"></image>
+                </span>
+                <span class="navbar-brand">EasyBallot.org</span>
+                </a>
+            </span>
             <button class="navbar-toggle inverse" data-toggle="collapse" data-target=".navHeaderCollapse">
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
@@ -54,7 +62,7 @@
                     </li> -->
                     <!--  <li><a href="#">Social Media</a>
                     </li> -->
-                    
+
                     <li ng-click="navClicked($index)">
                         <a href="#about" ng-show="!isLoggedIn">About</a>
                     </li>
@@ -64,7 +72,7 @@
                     <li id="home" ng-click="navClicked($index)" class="">
                         <a href="#home" ng-show="isLoggedIn">Home</a>
                     </li>
-                     <li ng-click="navClicked($index)">
+                    <li ng-click="navClicked($index)">
 
                         <a href="#history" ng-show="isLoggedIn">History&nbsp;<span class="badge">{{numberOfBillsVotedOn}}</span> </a>
                     </li>

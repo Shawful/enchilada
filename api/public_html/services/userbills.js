@@ -23,7 +23,7 @@ exports.getUserVotedBills = function() {
         if (user.votes.length > 0) {
         var startIndex = (page - 1 )* limit;
         console.log("index : "+startIndex);
-        var slicedArray = user.votes.slice(startIndex , limit);
+        var slicedArray = user.votes.slice(startIndex , limit*page);
             if(slicedArray.length === 0)
                 return res.status(200).send(slicedArray);
             

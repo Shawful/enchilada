@@ -18,11 +18,10 @@ exports.searchBills = function(MongoClient) {
     var re = /(hr|s)[0-9]/;
     var billPath;
     if(!re.test(billSearch))
-        billPath = '/bills/search?congress__in=113|112|111&query="'+encodeURIComponent(billSearch)+'"&history.enacted=true&per_page='+limit+"&page="+page
+        billPath = '/bills/search?congress__in=113|112|111&query="'+encodeURIComponent(billSearch)+'"&history.enacted=true&per_page='+limit+"&page="+page;
     else
         billPath = '/bills/search?bill_id=' + billSearch + '-113&fields=bill_id,official_title,short_title' ;       
-    console.log("page : "+page);
-    console.log("per_page : "+limit);
+    
     var options = {
                 host: 'congress.api.sunlightfoundation.com',
                 path: billPath,

@@ -12,7 +12,7 @@ exports.getUserVotedBills = function() {
         var apikey = config.sunlight_apikey;
         var user = req.params.user;
         var billCount = 0;
-        var limit = req.query.per_page ;
+        var limit = req.query.per_page;
         var page = req.query.page;
         if(!page)
             page =1;
@@ -22,6 +22,7 @@ exports.getUserVotedBills = function() {
         var timelineObjects = [];
         if (user.votes.length > 0) {
         var startIndex = (page - 1 )* limit;
+        console.log("index : "+startIndex);
         var slicedArray = user.votes.slice(startIndex , limit);
             if(slicedArray.length === 0)
                 return res.status(200).send(slicedArray);
@@ -60,8 +61,7 @@ exports.getUserVotedBills = function() {
             );
             
             
-        }
-        else
+        }else
             return res.status(200).send(timelineObjects);
     };
 };

@@ -21,6 +21,8 @@ exports.getUserVotedBills = function() {
         
         var timelineObjects = [];
         if (user.votes.length > 0) {
+            billCount = user.votes.length;
+        timelineObjects.push({"count" : billCount});    
         var startIndex = (page - 1 )* limit;
         console.log("index : "+startIndex);
         var slicedArray = user.votes.slice(startIndex , limit*page);

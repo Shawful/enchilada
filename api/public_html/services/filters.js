@@ -25,7 +25,6 @@ exports.saveFilters = function() {
 exports.getUserFilters = function() {
     return function(req, res) {
     var user = req.params.user;
-    console.log(user.filters);
     if(user.filters){
         return res.status(200).send(user.filters);
     }

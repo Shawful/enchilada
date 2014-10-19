@@ -8,14 +8,24 @@ var async = require('async');
 
 exports.getUserVotedBills = function() {
     return function(req, res) {
-
+        
         var apikey = config.sunlight_apikey;
         var user = req.params.user;
         var billCount = 0;
+        var limit = req.query.per_page ;
+        var page = req.query.page;
+        if(!page)
+            page =1;
+        if(!limit)
+            limit = 5;
+        
         var timelineObjects = [];
         if (user.votes.length > 0) {
-
-            for (var i in user.votes) {
+        var startIndex = (page -1 )* limit;
+        var slicedArray = user.votes.slice(startIndex , limit);
+            if(slicedArray.length === 0)
+                return res.status(200).send(slicedArray);
+            for (var i in slicedArray) {
                 var bill = user.votes[i];
                 var options = {
                     host: 'congress.api.sunlightfoundation.com',
@@ -304,7 +314,7 @@ exports.voteOnABillExperimentAsync = function() {
             vote = true;
         else
             vote = false;
-
+        var currentTime = new Date();
         var originalBillVote = null;
         var flagToRecast = false;
         var userVotes = user.votes;
@@ -322,7 +332,7 @@ exports.voteOnABillExperimentAsync = function() {
             console.log("modifying the vote postion");
             MongoClient.connect('mongodb://127.0.0.1:27017/users', function(err, db) {
                 var collection = db.collection('authentications');
-                collection.update({_id: user._id, "votes.bill_id": billId}, {$set: {"votes.$.vote": vote}}, function(err, records) {
+                collection.update({_id: user._id, "votes.bill_id": billId}, {$set: {"votes.$.vote": vote ,"votes.$.voted_at": currentTime }}, function(err, records) {
                     if (err) {
                         console.log(err);
                         return res.status(400).send("failed to record vote");
@@ -405,7 +415,7 @@ exports.voteOnABillExperimentAsync = function() {
             console.log("Saving a new bill vote");
             MongoClient.connect('mongodb://127.0.0.1:27017/users', function(err, db) {
                 var collection = db.collection('authentications');
-                collection.update({_id: user._id}, {$addToSet: {votes: {"bill_id": billId, "vote": vote}}}, function(err, records) {
+                collection.update({_id: user._id}, {$addToSet: {votes: {"bill_id": billId, "vote": vote ,"voted_at": currentTime}}}, function(err, records) {
                     if (err) {
                         console.log(err);
                         return res.status(400).send("failed to record vote");

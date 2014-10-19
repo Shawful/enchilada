@@ -61,11 +61,11 @@
                     <li ng-click="navClicked($index)">
                         <a href="#contact" ng-show="isLoggedIn" data-toggle="modal">Contact Us</a>
                     </li>
-                    <li id="home" ng-click="navClicked($index)" class="active">
+                    <li id="home" ng-click="navClicked($index)" class="">
                         <a href="#home" ng-show="isLoggedIn">Home</a>
                     </li>
                      <li ng-click="navClicked($index)">
-                        <a href="#history" ng-show="isLoggedIn" data-toggle="modal">History</a>
+                        <a href="#history" ng-show="isLoggedIn">History</a>
                     </li>
                     <li id="userOptions" class="dropdown" ng-click="navClicked($index)">
                         <a ng-show="isLoggedIn" class="dropdown-toggle" data-toggle="dropdown">{{user.username}}<b class="caret"></b></a>

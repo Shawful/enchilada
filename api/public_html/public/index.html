@@ -34,7 +34,7 @@
             <div class="collapse navbar-collapse navHeaderCollapse">
                 <ul class="nav navbar-nav navbar-right">
 
-                    <li>
+                    <li ng-class="{active: $index==navSelectedIndex}" ng-click="navClicked($index)">
                         <a href="#login" ng-show="!isLoggedIn">Login</a>
                     </li>
                     <!-- <li><a href="#login"> {{isLoggedIn}}</a></li> -->
@@ -54,16 +54,17 @@
                     </li> -->
                     <!--  <li><a href="#">Social Media</a>
                     </li> -->
-                    <li>
+                    
+                    <li ng-click="navClicked($index)">
                         <a href="#about" ng-show="!isLoggedIn">About</a>
                     </li>
-                    <li>
+                    <li ng-click="navClicked($index)">
                         <a href="#contact" ng-show="isLoggedIn" data-toggle="modal">Contact Us</a>
                     </li>
-                    <li class="active">
+                    <li id="home" ng-click="navClicked($index)" class="active">
                         <a href="#home" ng-show="isLoggedIn">Home</a>
                     </li>
-                    <li class="dropdown">
+                    <li id="userOptions" class="dropdown" ng-click="navClicked($index)">
                         <a ng-show="isLoggedIn" class="dropdown-toggle" data-toggle="dropdown">{{user.username}}<b class="caret"></b></a>
                         <ul class="dropdown-menu">
                             <li>
@@ -179,7 +180,7 @@ ga('send', 'pageview');
 
 <script src="scripts/b97d0b13.vendor.js"></script>
 
-<script src="scripts/da39f75e.scripts.js"></script>
+<script src="scripts/964e57e5.scripts.js"></script>
 
 <!-- JSON files until Server is up and running are stored in the "json" folder -->
 <!-- Current Calls -->

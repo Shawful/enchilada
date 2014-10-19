@@ -164,3 +164,20 @@ var sendVerificationEmail = function(email,verificationCode) {
 
     
 };
+
+exports.getUserProfile = function (){
+    return function(req,res){
+        var user = req.params.user;
+        
+        var userProfile;
+        userProfile.firstName = user.firstName;
+        userProfile.lastName = user.lastName;
+        userProfile.age = user.age;
+        userProfile.sex = user.sex;
+        userProfile.address = user.address;
+        userProfile.zipcode = user.zipcode;
+        userProfile.filters = user.filters;
+                
+        return res.status(200).send(userProfile);
+    };
+};

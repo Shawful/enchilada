@@ -65,7 +65,8 @@
                         <a href="#home" ng-show="isLoggedIn">Home</a>
                     </li>
                      <li ng-click="navClicked($index)">
-                        <a href="#history" ng-show="isLoggedIn">History</a>
+
+                        <a href="#history" ng-show="isLoggedIn">History&nbsp;<span class="badge">4</span> </a>
                     </li>
                     <li id="userOptions" class="dropdown" ng-click="navClicked($index)">
                         <a ng-show="isLoggedIn" class="dropdown-toggle" data-toggle="dropdown">{{user.username}}<b class="caret"></b></a>

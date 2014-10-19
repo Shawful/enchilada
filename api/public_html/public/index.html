@@ -66,7 +66,7 @@
                     </li>
                      <li ng-click="navClicked($index)">
 
-                        <a href="#history" ng-show="isLoggedIn">History&nbsp;<span class="badge">4</span> </a>
+                        <a href="#history" ng-show="isLoggedIn">History&nbsp;<span class="badge">{{numberOfBillsVotedOn}}</span> </a>
                     </li>
                     <li id="userOptions" class="dropdown" ng-click="navClicked($index)">
                         <a ng-show="isLoggedIn" class="dropdown-toggle" data-toggle="dropdown">{{user.username}}<b class="caret"></b></a>
@@ -184,7 +184,7 @@ ga('send', 'pageview');
 
 <script src="scripts/b97d0b13.vendor.js"></script>
 
-<script src="scripts/041c6ab0.scripts.js"></script>
+<script src="scripts/a627c4c3.scripts.js"></script>
 
 <!-- JSON files until Server is up and running are stored in the "json" folder -->
 <!-- Current Calls -->

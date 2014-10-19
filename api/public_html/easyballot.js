@@ -81,8 +81,10 @@ app.get('/', function(req, res) {
 app.post('/user', userService.createNewAccount());
 
 app.post('/user/login', userService.login());
+
 app.post('/user/verify/:code', userService.verify());
 
+app.get('/user/profile' , requireAuth() , userService.getUserProfile());
 
 //SAVE USER ZIP CODE
 app.put('/user/zipcode/:zipcode', requireAuth(), zipCodeService.saveZipCodeForUser(MongoClient));

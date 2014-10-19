@@ -169,7 +169,7 @@ exports.getUserProfile = function (){
     return function(req,res){
         var user = req.params.user;
         
-        var userProfile;
+        var userProfile = new Object();
         userProfile.firstName = user.firstName;
         userProfile.lastName = user.lastName;
         userProfile.age = user.age;

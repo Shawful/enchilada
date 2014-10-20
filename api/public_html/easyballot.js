@@ -133,4 +133,4 @@ app.post('/reset' , requireAuth() , userBillService.clearBills());
 
 app.post('/contact' , requireAuth() , contactService.sendFeedBack());
 
-//app.get('/sendemail' , emailService.sendVerificationEmail('easyballot@gmail.com' ,'773778939'));
+app.get('/votes' , requireAuth(),userBillService.getSenatorsOnaBill());

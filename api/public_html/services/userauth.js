@@ -181,3 +181,24 @@ exports.getUserProfile = function (){
         return res.status(200).send(userProfile);
     };
 };
+
+exports.changeUserProfile = function() {
+    return function(req , res){
+        var user = req.params.user;
+        var userProfile = req.body;
+        
+        MongoClient.connect('mongodb://127.0.0.1:27017/users', function(err, db) {
+            if (err)
+                throw err;
+            var collection = db.collection('authentications');
+            collection.update({_id : user._id},{$set : userProfile},
+                function(err,updatedRecords){
+                    if (err) {
+                    return res.status(400).send("Failed to update profile");
+                }
+                return res.status(200).send("updated records "+updatedRecords);
+            });
+        });
+        
+    };
+};

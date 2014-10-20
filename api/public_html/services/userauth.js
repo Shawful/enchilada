@@ -202,3 +202,31 @@ exports.changeUserProfile = function() {
         
     };
 };
+
+exports.checkUserNameAvailability = function() {
+    return function(req , res){
+        var email;
+        if(req.body){
+            email = req.body.email;
+        }else{
+            return res.status(400).send('Email required');
+        }
+            
+        
+        MongoClient.connect('mongodb://127.0.0.1:27017/users', function(err, db) {
+            if (err)
+                throw err;
+            var collection = db.collection('authentications');
+            collection.findOne({_id : email},function(err,user){
+                    if (err) {
+                         return res.status(400).send("Failed to update profile");
+                    }
+                    if(user !== null)
+                        return res.status(200).send({"available" : false});
+                    else
+                        return res.status(200).send({"available" : true});
+            });
+        });
+        
+    };
+};

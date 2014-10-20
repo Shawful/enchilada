@@ -104,6 +104,9 @@ app.post('/user/bills/:billId/:vote', requireAuth(), userBillService.voteOnABill
 //GET ALL THE BILLS
 app.get('/user/bills', requireAuth(), userBillService.getUserVotedBills());
 
+//GET ALL THE BILLS
+app.get('/user/bills/count', requireAuth(), userBillService.getUserBillCount());
+
 
 //CALCULATE REP WORTHINESS
 app.get('/user/reps', requireAuth(), repService.getUserRepsAsync());
@@ -134,3 +137,5 @@ app.get('/user/filters', requireAuth(), filterService.getUserFilters() );
 app.post('/reset' , requireAuth() , userBillService.clearBills());
 
 app.post('/contact' , requireAuth() , contactService.sendFeedBack());
+
+app.post('/available' ,userService.checkUserNameAvailability() );

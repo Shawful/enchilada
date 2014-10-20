@@ -337,3 +337,13 @@ exports.voteOnABillExperimentAsync = function() {
 };
 
 
+exports.getUserBillCount = function() {
+    return function(req, res) {
+        var user = req.params.user;
+        
+        if(user.votes)
+            return res.status(200).send({"count" : user.votes.length});
+        else
+            return res.status(200).send({"count" : 0});
+    };
+};

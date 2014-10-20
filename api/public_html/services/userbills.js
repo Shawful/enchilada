@@ -59,7 +59,7 @@ exports.getUserVotedBills = function() {
                     function(err) {
                         if (err)
                             return res.status(400).send(err);
-                        finalResult.bills = timeLineObjects;
+                        finalResult.bills = timelineObjects;
                         finalResult.count = billCount ;
                         return res.status(200).send(finalResult);
                     }

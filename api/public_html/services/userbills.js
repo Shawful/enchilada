@@ -64,10 +64,12 @@ exports.getUserVotedBills = function() {
                                             var senatorVote = JSON.parse(result);
                                             
                                             if (senatorVote.count > 0) {
-                                                console.log('senator : '+senator.id+' is '+senatorVote.results[0].voters[senator.id].vote);
+//                                                console.log('senator : '+senator.id+' is '+senatorVote.results[0].voters[senator.id].vote);
                                                 if (senatorVote.results[0].voters[senator.id]) {
                                                     senatorVotes.push({"senator" : senator.id , "vote" :senatorVote.results[0].voters[senator.id].vote });
                                                 }
+                                            }else{
+                                                senatorVotes.push({"senator" : senator.id , "vote" :"-" });
                                             }
                                             callback2();
                                             
@@ -80,7 +82,7 @@ exports.getUserVotedBills = function() {
                                     rep.write("");
                                     rep.end();
                                 },function(err) {
-                                    console.log('callback2');
+                                    
                                         if (err)
                                             return res.status(400).send(err);
                                         timelineObjects.push({"bill": data.results[0], "uservote": bill.vote, "voted_at" : bill.voted_at , 
@@ -116,48 +118,6 @@ exports.getUserVotedBills = function() {
         }
     };
 };
-
-function callSunlight(options) {
-    var promise = new Promise(function(resolve, reject) {
-        var callVote = http.request(options, function(response) {
-
-            response.on('data', function(data) {
-                data = JSON.parse(data);
-                resolve(data);
-            });
-            response.on('error', function(e) {
-                console.log(e);
-                reject(err);
-            });
-        });
-        callVote.write("");
-        callVote.end();
-    });
-
-    return promise;
-}
-
-function callSunlightAndStoreVote(options, vote) {
-    var promise = new Promise(function(resolve, reject) {
-        var callVote = http.request(options, function(response) {
-
-            response.on('data', function(data) {
-                data = JSON.parse(data);
-
-                resolve({"data": data, "vote": vote});
-            });
-            response.on('error', function(e) {
-                console.log(e);
-                reject(err);
-            });
-        });
-        callVote.write("");
-        callVote.end();
-    });
-
-    return promise;
-}
-
 
 
 exports.clearBills = function() {
@@ -377,53 +337,3 @@ exports.voteOnABillExperimentAsync = function() {
 };
 
 
-exports.getSenatorsOnaBill = function(){
-    return function(req , res){
-        var user = req.params.user;
-        var senators = user.senators;
-        var bill_id = 'hr5563-113';
-        var senatorVotes = [];
-                async.eachSeries(senators , 
-                    function(senator , callback2){
-                    
-                    var options = {
-                        host: 'congress.api.sunlightfoundation.com',
-                        path: '/votes?voter_ids.' + senator.id + '__exists=true&vote_type=passage&bill_id=' + bill_id + '&fields=voters.' + senator.id + '.vote',
-                        method: 'GET',
-                        headers: {'x-apikey': apikey}
-                    };
-                    var rep = http.request(options, function(response) {
-                        var result = '';
-                        response.on('data', function(chunk) {
-                            result += chunk;
-                        });
-                        response.on('end', function() {
-                            var senatorVote = JSON.parse(result);
-
-                            if (senatorVote.count > 0) {
-                                console.log('senator : '+senator.id+' is '+senatorVote.results[0].voters[senator.id].vote);
-                                if (senatorVote.results[0].voters[senator.id]) {
-                                    senatorVotes.push({"senator" : senator.id , "vote" :senatorVote.results[0].voters[senator.id].vote });
-                                }
-                            }
-                            callback2();
-
-                        });
-                        response.on('error', function (e) {
-                                console.log(e);
-                                callback2(e);
-                        });
-                    });
-                    rep.write("");
-                    rep.end();
-                },function(err) {
-                    console.log('callback2');
-                        if (err)
-                            return res.status(400).send(err);
-                        
-                        return res.status(200).send(senatorVotes);
-                        
-                        //callback();
-                });
-    };
-};

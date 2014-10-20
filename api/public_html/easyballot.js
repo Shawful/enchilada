@@ -132,5 +132,3 @@ app.get('/user/filters', requireAuth(), filterService.getUserFilters() );
 app.post('/reset' , requireAuth() , userBillService.clearBills());
 
 app.post('/contact' , requireAuth() , contactService.sendFeedBack());
-
-app.get('/votes' , requireAuth(),userBillService.getSenatorsOnaBill());

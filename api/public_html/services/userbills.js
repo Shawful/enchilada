@@ -14,15 +14,16 @@ exports.getUserVotedBills = function() {
         var billCount = 0;
         var limit = req.query.per_page;
         var page = req.query.page;
-        if(!page)
+        if(!page || page < 0)
             page =1;
-        if(!limit)
+        if(!limit || limit < 0)
             limit = 5;
-        
+        var finalResult = new Object();
         var timelineObjects = [];
         if (user.votes.length > 0) {
-            billCount = user.votes.length;
-        timelineObjects.push({"count" : billCount});    
+        billCount = user.votes.length;
+        finalResult.count = billCount;    
+            
         var startIndex = (page - 1 )* limit;
         console.log("index : "+startIndex);
         var slicedArray = user.votes.slice(startIndex , limit*page);
@@ -58,13 +59,18 @@ exports.getUserVotedBills = function() {
                     function(err) {
                         if (err)
                             return res.status(400).send(err);
-                        return res.status(200).send(timelineObjects);
+                        finalResult.bills = timeLineObjects;
+                        finalResult.count = billCount ;
+                        return res.status(200).send(finalResult);
                     }
             );
             
             
-        }else
-            return res.status(200).send(timelineObjects);
+        }else{
+            finalResult.bills = timelineObjects;
+            finalResult.count = 0;
+            return res.status(200).send(finalResult);
+        }
     };
 };
 

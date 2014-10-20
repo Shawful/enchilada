@@ -45,7 +45,44 @@ exports.getUserVotedBills = function() {
                         response.on('end', function () {
                                var data = JSON.parse(result);
                                if(data.count > 0 ) 
-                                timelineObjects.push({"bill": data.results[0], "uservote": bill.vote, "voted_at" : bill.voted_at} );
+                                
+                                var senatorVotes = [];
+                                async.eachSeries(user.senators , function(senator , callback2){
+                                    var options = {
+                                        host: 'congress.api.sunlightfoundation.com',
+                                        path: '/votes?voter_ids.' + senator.id + '__exists=true&vote_type=passage&bill_id=' + bill.bill_id + '&fields=voters.' + senator.id + '.vote',
+                                        method: 'GET',
+                                        headers: {'x-apikey': apikey}
+                                    };
+                                    var rep = http.request(options, function(response) {
+                                        var result = '';
+                                        response.on('data', function(chunk) {
+                                            result += chunk;
+                                        });
+                                        response.on('end', function() {
+                                            var senatorVote = JSON.parse(result);
+                                            if (senatorVote.count > 0) {
+
+                                                if (senatorVote.results[0].voters[senator.id]) {
+                                                    senatorVotes.push({"senator" : senator.id , "vote" :senatorVote.results[0].voters[senator.id].vote });
+                                                }
+                                            }
+                                            callback2();
+                                        });
+                                        response.on('error', function (e) {
+                                                console.log(e);
+                                                callback2(e);
+                                        });
+                                    });
+                                    rep.write("");
+                                    rep.end();
+                                }),function(err) {
+                                        if (err)
+                                            return res.status(400).send(err);
+                                        timelineObjects.push({"bill": data.results[0], "uservote": bill.vote, "voted_at" : bill.voted_at , 
+                                                    "senatorVotes" : senatorVotes} );
+                                };
+                            
                                callback();
                         });
                         response.on('error', function (e) {

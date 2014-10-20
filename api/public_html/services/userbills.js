@@ -81,6 +81,7 @@ exports.getUserVotedBills = function() {
                                             return res.status(400).send(err);
                                         timelineObjects.push({"bill": data.results[0], "uservote": bill.vote, "voted_at" : bill.voted_at , 
                                                     "senatorVotes" : senatorVotes} );
+                                        console.log("bills : "+timelineObjects);
                                         callback();
                                 };
                             

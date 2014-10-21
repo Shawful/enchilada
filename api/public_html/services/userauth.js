@@ -177,6 +177,9 @@ exports.getUserProfile = function (){
         userProfile.address = user.address;
         userProfile.zipcode = user.zipcode;
         userProfile.filters = user.filters;
+        userProfile.share = user.share;
+        userProfile.district = user.district;
+        userProfile.state = user.state;
                 
         return res.status(200).send(userProfile);
     };

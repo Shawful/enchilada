@@ -1,6 +1,6 @@
 var MongoClient = require('mongodb').MongoClient;
 var db;
-var dbName = "users";
+var dbName = "easyballot";
 var server = "127.0.0.1";
 
 exports.init = function(){

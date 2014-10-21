@@ -26,7 +26,7 @@
                       }
 
                       function renderLikeButton() {
-                          element.html('<span class="pull-left fb-like" data-layout="button_count" data-action="like" data-show-faces="true" data-share="true"></span>');
+                          element.html('<div class="fb-like" data-layout="button_count" data-action="like" data-show-faces="true" data-share="true"></div>');
                           $window.FB.XFBML.parse(element.parent()[0]);
                       }
                   }

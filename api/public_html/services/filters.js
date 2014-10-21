@@ -1,4 +1,4 @@
-var MongoClient = require('mongodb').MongoClient;
+var dbConnection = require('../services/dbconnector');
 var config = require('/opt/apps/properties/config.json');
 var apikey = config.sunlight_apikey;
 
@@ -7,9 +7,9 @@ exports.saveFilters = function() {
     var user = req.params.user;
     var jsonBody = req.body;
     
-   MongoClient.connect('mongodb://127.0.0.1:27017/users', function(err, db) {
-        if (err)
-            throw err;
+    var db = dbConnection.getDbConnection();
+        if(!db)
+            return res.status(500).send("Failed to initialize the db.");
 
         var collection = db.collection('authentications');
             collection.update({_id : user._id} ,{$set:{"filters" : jsonBody}}, function(err, records) {
@@ -18,7 +18,7 @@ exports.saveFilters = function() {
             }
             return res.send("filters saved");
             });
-        });
+        
     };
 };
 

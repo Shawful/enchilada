@@ -86,11 +86,46 @@ exports.getBillSummary = function() {
     };
 };
 
+exports.getBillDetails = function() {
+    return function(req, res) {
+    var billId = req.param("billId");    
+    
+    if(! billId)
+        return res.status(400).send('missing bill Id');
+    
+    var options = {
+                host: 'congress.api.sunlightfoundation.com',
+                path: '/bills/search?bill_id='+billId,
+                method: 'GET',
+                headers: {'x-apikey': apikey }
+    };
+    
+    var bill = http.request(options, function( response) {
+                
+                var result ='';
+                response.on('data', function (chunk) {
+                        result += chunk;
+                });
+                response.on('end', function () {
+                        var data = JSON.parse(result);
+                        return res.status(200).send(data);
+                });
+                response.on('error', function (e) {
+                        console.log(e);
+                        return  res.status(400).send(e);
+                });
+    });
+                        
+    bill.write("");
+    bill.end();
+
+    };
+};
+
 exports.getRecentBills = function() {
     return function(req, res) {
     
-    var limit = req.query.per_page ;
-    var limit = req.query.per_page ;
+    var limit = req.query.per_page;
     var page = req.query.page;
     if(!page)
         page =1;

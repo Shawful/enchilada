@@ -1,4 +1,4 @@
-var MongoClient = require('mongodb').MongoClient;
+var dbConnection = require('../services/dbconnector');
 var config = require('/opt/apps/properties/config.json');
 var apikey = config.sunlight_apikey;
 var http = require('https');
@@ -11,10 +11,10 @@ exports.saveARep = function() {
     var user = req.params.user;
     var jsonBody = req.body;
     
-   MongoClient.connect('mongodb://127.0.0.1:27017/users', function(err, db) {
-        if (err)
-            throw err;
-
+    var db = dbConnection.getDbConnection();
+    if(!db)
+        return res.status(500).send("Failed to initialize the db.");
+        
         var collection = db.collection('authentications');
             collection.update({_id : user._id} ,{$addToSet:{"reps" : {$each : jsonBody}}}, function(err, records) {
             if (err) {
@@ -22,7 +22,7 @@ exports.saveARep = function() {
             }
             return res.send("Reps saved");
             });
-        });
+        
     };
 };
 
@@ -65,9 +65,9 @@ exports.addReps = function() {
         senatorObjects.push({"id" : repArray[i] , "disagree" : 0});
     }
     
-    MongoClient.connect('mongodb://127.0.0.1:27017/users', function(err, db) {
-        if (err)
-            throw err;
+    var db = dbConnection.getDbConnection();
+    if(!db)
+        return res.status(500).send("Failed to initialize the db.");
 
         var collection = db.collection('authentications');
         collection.update({"_id" : user._id}, {$set : {"senators" : [] } } , function(err, records) {
@@ -85,7 +85,7 @@ exports.addReps = function() {
             });
         });
 
-    });
+    
     };
 };
 
@@ -95,9 +95,9 @@ exports.deleteARep = function() {
     var user = req.params.user;
     var repId = req.param('repId');
 
-    MongoClient.connect('mongodb://127.0.0.1:27017/users', function(err, db) {
-        if (err)
-            throw err;
+    var db = dbConnection.getDbConnection();
+    if(!db)
+        return res.status(500).send("Failed to initialize the db.");
 
         var collection = db.collection('authentications');
 
@@ -107,7 +107,7 @@ exports.deleteARep = function() {
             }
             return res.send("Rep " + repId + " deleted");
         });
-    });
+    
     };
 };
 
@@ -183,10 +183,10 @@ exports.findRepsByLatLong = function() {
 };
 
 function calculateDisagreementsForNewlyAddedSenators(userId , senators , votedBills){
-    MongoClient.connect('mongodb://127.0.0.1:27017/users', function(err, db) {
-        if (err)
-            throw err;
-
+    var db = dbConnection.getDbConnection();
+    if(!db)
+        return res.status(500).send("Failed to initialize the db.");
+        
         var collection = db.collection('authentications');
     for (var i in senators){
         var senator = senators[i];
@@ -229,7 +229,7 @@ function calculateDisagreementsForNewlyAddedSenators(userId , senators , votedBi
             
         }
     }
-    });
+    
 };
 
 function callSunlightAndStoreVote(options, vote) {

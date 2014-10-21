@@ -19,6 +19,8 @@ app.use(express.methodOverride());
 app.use(express.static(path.join(__dirname + '/public')));
 app.use(app.router);
 
+var dbConnection = require('./services/dbconnector');
+dbConnection.init();
 
 var repService = require('./services/reps');
 var zipCodeService = require('./services/zipcode');
@@ -34,10 +36,11 @@ function requireAuth() {
     return function(req, res, next) {
         if (req.headers['x-auth'] != null) {
             var authtoken = req.headers['x-auth'];
-            MongoClient.connect('mongodb://127.0.0.1:27017/users', function(err, db) {
-                if (err)
-                    throw err;
-
+            
+            
+                var db = dbConnection.getDbConnection();
+                if(!db)
+                    return res.status(500).send("Failed to initialize the db.");
                 var collection = db.collection('tokens');
 
                 //FIND IF THE USERNAME AND PASSWORD EXIST
@@ -64,7 +67,7 @@ function requireAuth() {
 
                 });
 
-            });
+            
         }
         else
             return res.status(403).send("no x-auth");

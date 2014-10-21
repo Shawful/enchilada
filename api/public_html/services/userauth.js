@@ -1,16 +1,16 @@
 var sha1 = require('sha1');
 var uuid = require('node-uuid');
-var MongoClient = require('mongodb').MongoClient
-        , format = require('util').format;
+var format = require('util').format;
 var config = require('/opt/apps/properties/config.json');
 var postmark = require("postmark")(config.postmarkApiEb);
+var dbConnection = require('../services/dbconnector');
 
 exports.createNewAccount = function() {
     return function(req, res) {
-    MongoClient.connect('mongodb://127.0.0.1:27017/users', function(err, db) {
-        if (err)
-            throw err;
-
+    
+        var db = dbConnection.getDbConnection();
+        if(!db)
+            return res.status(500).send("Failed to initialize the db.");
         var collection = db.collection('authentications');
 
 
@@ -38,7 +38,7 @@ exports.createNewAccount = function() {
         }else
             return res.status(400).send("Bad data");
 
-    });
+    
     };
 };
 
@@ -51,10 +51,10 @@ exports.login = function() {
     if(username === null || password === null){
         res.status(400).send("Username and password required");
     }
-    MongoClient.connect('mongodb://127.0.0.1:27017/users', function(err, db) {
-        if (err)
-            throw err;
-
+    
+        var db = dbConnection.getDbConnection();
+                if(!db)
+                    return res.status(500).send("Failed to initialize the db.");
         var collection = db.collection('authentications');
         
         
@@ -92,7 +92,7 @@ exports.login = function() {
             
         });
 
-    });
+    
     };
 };
 
@@ -102,16 +102,16 @@ exports.verify = function(){
         var verificationCode = req.param('code');
         if(!verificationCode)
             return res.status(400).send("Verification code is missing");
-        MongoClient.connect('mongodb://127.0.0.1:27017/users', function(err, db) {
-            if (err)
-            throw err;
+        var db = dbConnection.getDbConnection();
+        if(!db)
+            return res.status(500).send("Failed to initialize the db.");
 
             var collection = db.collection('authentications');
             collection.findOne({"verificationToken" : verificationCode}, function(err, result) {
                 if (err) {
                     return res.status(400).send("Failed");
                 }
-                if(result == null){
+                if(result === null){
                     return res.status(404).send("Invalid verification code");
                 }
                 
@@ -131,7 +131,7 @@ exports.verify = function(){
                 
                 
             });
-        });    
+            
     };
 };
 
@@ -187,9 +187,10 @@ exports.changeUserProfile = function() {
         var user = req.params.user;
         var userProfile = req.body;
         
-        MongoClient.connect('mongodb://127.0.0.1:27017/users', function(err, db) {
-            if (err)
-                throw err;
+        var db = dbConnection.getDbConnection();
+        if(!db)
+            return res.status(500).send("Failed to initialize the db.");
+        
             var collection = db.collection('authentications');
             collection.update({_id : user._id},{$set : userProfile},
                 function(err,updatedRecords){
@@ -198,7 +199,7 @@ exports.changeUserProfile = function() {
                 }
                 return res.status(200).send("updated records "+updatedRecords);
             });
-        });
+        
         
     };
 };
@@ -212,10 +213,10 @@ exports.checkUserNameAvailability = function() {
             return res.status(400).send('Email required');
         }
             
+        var db = dbConnection.getDbConnection();
+        if(!db)
+            return res.status(500).send("Failed to initialize the db.");
         
-        MongoClient.connect('mongodb://127.0.0.1:27017/users', function(err, db) {
-            if (err)
-                throw err;
             var collection = db.collection('authentications');
             collection.findOne({_id : email},function(err,user){
                     if (err) {
@@ -226,7 +227,7 @@ exports.checkUserNameAvailability = function() {
                     else
                         return res.status(200).send({"available" : true});
             });
-        });
+        
         
     };
 };

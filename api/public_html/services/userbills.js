@@ -2,8 +2,7 @@ var Promise = require('promise');
 var config = require('/opt/apps/properties/config.json');
 var apikey = config.sunlight_apikey;
 var http = require('https');
-var MongoClient = require('mongodb').MongoClient
-        , format = require('util').format;
+var dbConnection = require('../services/dbconnector');
 var async = require('async');
 
 exports.getUserVotedBills = function() {
@@ -130,9 +129,9 @@ exports.clearBills = function() {
                 reps[i].novote = 0;
             }
         }
-        MongoClient.connect('mongodb://127.0.0.1:27017/users', function(err, db) {
-            if (err)
-                throw err;
+        var db = dbConnection.getDbConnection();
+        if(!db)
+            return res.status(500).send("Failed to initialize the db.");
 
             var collection = db.collection('authentications');
             collection.update({_id: user._id}, {$set: {"votes": [], "senators": reps}}, function(err, records) {
@@ -142,7 +141,7 @@ exports.clearBills = function() {
 
                 return res.send("bills reset");
             });
-        });
+        
     };
 };
 
@@ -178,7 +177,9 @@ exports.voteOnABillExperimentAsync = function() {
 
         if (flagToRecast) { //changing the vote
             console.log("modifying the vote postion");
-            MongoClient.connect('mongodb://127.0.0.1:27017/users', function(err, db) {
+            var db = dbConnection.getDbConnection();
+            if(!db)
+                return res.status(500).send("Failed to initialize the db.");
                 var collection = db.collection('authentications');
                 collection.update({_id: user._id, "votes.bill_id": billId}, {$set: {"votes.$.vote": vote ,"votes.$.voted_at": currentTime }}, function(err, records) {
                     if (err) {
@@ -257,11 +258,13 @@ exports.voteOnABillExperimentAsync = function() {
                             }
                     );
                 });
-            });
+            
 
         } else {
             console.log("Saving a new bill vote");
-            MongoClient.connect('mongodb://127.0.0.1:27017/users', function(err, db) {
+            var db = dbConnection.getDbConnection();
+            if(!db)
+                return res.status(500).send("Failed to initialize the db.");
                 var collection = db.collection('authentications');
                 collection.update({_id: user._id}, {$addToSet: {votes: {"bill_id": billId, "vote": vote ,"voted_at": currentTime}}}, function(err, records) {
                     if (err) {
@@ -331,7 +334,7 @@ exports.voteOnABillExperimentAsync = function() {
                             }
                     );
                 });
-            });
+            
         }
     };
 };

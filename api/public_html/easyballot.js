@@ -131,7 +131,7 @@ app.get('/bills/search', billService.searchBills());
 
 app.get('/bills/summary/:billId', billService.getBillSummary());
 
-app.get('/bills/:billId', billService.getBillDetails());
+app.get('/bills/:billId/full', billService.getBillDetails());
 
 app.get('/bills/recent', billService.getRecentBills());
 

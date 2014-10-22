@@ -124,7 +124,7 @@ exports.getBillDetails = function() {
 
 exports.getRecentBills = function() {
     return function(req, res) {
-    
+    console.log('in recent bills');
     var limit = req.query.per_page;
     var page = req.query.page;
     if(!page)

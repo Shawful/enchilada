@@ -180,7 +180,7 @@ exports.getUserProfile = function (){
         userProfile.share = user.share;
         userProfile.district = user.district;
         userProfile.state = user.state;
-                
+        userProfile.senators = user.senators;        
         return res.status(200).send(userProfile);
     };
 };

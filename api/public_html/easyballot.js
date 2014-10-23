@@ -4,7 +4,7 @@ var app = express();
 
 var fs = require('fs');
 var sslOptions = {
-  key: fs.readFileSync('/opt/apps/certs/eb-key.pem'),
+  key: fs.readFileSync('/opt/apps/certs/eb-ssl-key.pem'),
   cert: fs.readFileSync('/opt/apps/certs/easyballot.crt'),
   ca: fs.readFileSync('/opt/apps/certs/gd_bundle-g2-g1.crt'),
   requestCert: true,

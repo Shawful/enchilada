@@ -1,16 +1,28 @@
 var express = require('express');
 var cors = require('cors');
 var app = express();
-var server = require('http').createServer(app);
+
+var fs = require('fs');
+var sslOptions = {
+  key: fs.readFileSync('/opt/apps/certs/eb-key.pem'),
+  cert: fs.readFileSync('/opt/apps/certs/easyballot.crt'),
+  ca: fs.readFileSync('/opt/apps/certs/gd_bundle-g2-g1.crt'),
+  requestCert: true,
+  rejectUnauthorized: false
+};
+
+
+var server = require('https').createServer(sslOptions,app);
+
+
 var http = require('https');
 var path = require('path');
-var MongoClient = require('mongodb').MongoClient
-        , format = require('util').format;
-var Promise = require('promise');
-var querystring = require("querystring");
+
 
 app.use(cors());
+
 server.listen(3000);
+
 var config = require('/opt/apps/properties/config.json');
 var apikey = config.sunlight_apikey;
 app.use(express.bodyParser());

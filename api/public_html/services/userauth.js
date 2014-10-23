@@ -140,9 +140,9 @@ var sendVerificationEmail = function(email,verificationCode) {
         var link ="http://ec2-54-173-13-225.compute-1.amazonaws.com:3000/#/user/verify/"+verificationCode;
         console.log('sending a link '+link);
         var emailBody = "<p>Hi Easyballot user,<br><br>\n\
-                Please click the link below to get the account verified.<br><br>\n\
-                <a href="+link+" >verify email</a>  or< br>\n\
-                copy and paster the below link in the browser\n\
+                Please click the link copy and paste the below link to get the account verified.<br><br>\n\
+                <br>\n\
+                \n\
                 <p>"+link+"</p><br><br>\n\
                 Thank you,<br>\n\
                 Easyballot Support team</p>";

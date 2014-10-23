@@ -104,7 +104,7 @@ app.get('/user/profile' , requireAuth() , userService.getUserProfile());
 app.put('/user/profile' , requireAuth() , userService.changeUserProfile());
 
 //SAVE USER ZIP CODE
-app.put('/user/zipcode/:zipcode', requireAuth(), zipCodeService.saveZipCodeForUser(MongoClient));
+app.put('/user/zipcode/:zipcode', requireAuth(), zipCodeService.saveZipCodeForUser());
 
 //GETS THE SAVED ZIPCODE
 app.get('/user/zipcode', requireAuth(), zipCodeService.getUserZipCode());
@@ -127,11 +127,11 @@ app.get('/user/bills/count', requireAuth(), userBillService.getUserBillCount());
 app.get('/user/reps', requireAuth(), repService.getUserRepsAsync());
 
 //SAVE ZIPCODE BASED REPS  Req body : ["asdasd","adasdas"]
-app.put('/user/reps', requireAuth(), repService.saveARep(MongoClient));
+app.put('/user/reps', requireAuth(), repService.saveARep());
 
-app.post('/user/reps', requireAuth(), repService.addReps(MongoClient));
+app.post('/user/reps', requireAuth(), repService.addReps());
 
-app.delete('/user/reps/:repId', requireAuth(), repService.deleteARep(MongoClient));
+app.delete('/user/reps/:repId', requireAuth(), repService.deleteARep());
 
 app.get('/zipcode/:zipcode/reps', zipCodeService.findRepsByZipCode());
 

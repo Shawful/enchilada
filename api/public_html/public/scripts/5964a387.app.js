@@ -80,8 +80,8 @@ app.config(['$routeProvider', '$locationProvider', function($routeProvider, $loc
 app.run(['$rootScope', '$location', '$cookieStore', '$http', 'Auth', function($rootScope, $location, $cookieStore, $http, auth) {
     //$scope.$apply();
     $rootScope.facebookAppId = '345699855603648';
-    $rootScope.urlRoot = 'http://ec2-54-172-95-254.compute-1.amazonaws.com:3000';
-    //$rootScope.urlRoot = '';
+    //$rootScope.urlRoot = 'http://ec2-54-172-95-254.compute-1.amazonaws.com:3000';
+    $rootScope.urlRoot = '';
     $rootScope.lastSearch = "";
     // $rootScope.urlAuth = 'http://ec2-54-85-38-129.compute-1.amazonaws.com:3000/user/login';
     // $rootScope.urlKeyService = 'http://jarvis-dev.niwsc.com/keyservices-1.0/rest'

@@ -3,6 +3,20 @@
 app.controller('landingCtrl', ['$scope', '$http', '$rootScope', '$location',
     function($scope, http, $rootScope, $location) {
         $scope.noData = false;
+        $scope.IntroOptions = {
+            steps: [{
+                element: document.querySelector('#step1'),
+                intro: "This is the first tooltip."
+            }],
+            showStepNumbers: false,
+            showBullets: false,
+            exitOnOverlayClick: true,
+            exitOnEsc: true,
+            nextLabel: '<strong>NEXT!</strong>',
+            prevLabel: '<span style="color:green">Previous</span>',
+            skipLabel: 'Exit',
+            doneLabel: 'Thanks'
+        };
 
         $scope.sendToLoginPage = function() {
             if ($rootScope.user.isLogged != true)
@@ -16,7 +30,7 @@ app.controller('landingCtrl', ['$scope', '$http', '$rootScope', '$location',
             //console.log('AHHH! cleared out error message');
             //console.log(searchText);
 
-          console.log('test');
+            console.log('test');
         });
 
         $scope.$on('search', function() {
@@ -32,7 +46,7 @@ app.controller('landingCtrl', ['$scope', '$http', '$rootScope', '$location',
             // console.log("Someone Logged in: " + sc.isLoggedIn);
         });
 
-        
+
 
     }
 ]);

@@ -2,7 +2,7 @@
 
 var app = angular.module('politicheckApp', ['ngCookies', 'ngResource', 'ngSanitize', 'ngRoute',
     'ui.bootstrap', 'ngAnimate', 'ui.keypress', 'mgo-angular-wizard',
-    'angulike', 'angular-spinkit'
+    'angulike', 'angular-spinkit', 'angular-intro'
 ]);
 
 var userRoles = {

@@ -9,38 +9,34 @@ app.controller('landingCtrl', ['$scope', '$http', '$rootScope', '$location',
             steps: [{
                 element: document.querySelector('#step1'),
                 intro: "<center>We look up all of your congress members for you.</center>",
-                dataPosition: 'right'
-            },
-            {
+                position: 'left'
+            }, {
                 element: document.querySelector('#step2'),
                 intro: "<center>You vote on bills that affect you personally.</center>",
-                dataPosition: 'right'
-            },
-            {
+                position: 'right'
+            }, {
                 element: document.querySelector('#step3'),
-                intro: "<center>And we calculate a repworthiness percentage.<br><br>The percentage <em>increases</em> if you agree with your representative, and it <div class='error'>decreases</div> if the represenative <em>disagrees or abstained from voting</em>.</center>"
-            },
-            {
+                intro: "<center>And we calculate a repworthiness percentage.<br><br>The percentage <em>increases</em> if you agree with your representative, but it <div class='error'>decreases</div> if the represenative <em>disagrees or abstained from voting</em>.</center>"
+            }, {
                 element: document.querySelector('#step4'),
                 intro: "<center>You can even pick topics that are interesting to you.</center>"
-            },
-            {
+            }, {
                 element: document.querySelector('#step5'),
-                intro: "<center>Or you can search for bills by name 'obamacare' or id 'hr5109'</center>"
-            },
-            {
+                intro: "<center>Or you can search for bills by topic, name 'obamacare', or id 'hr5109'</center>"
+            }, {
                 element: document.querySelector('#step6'),
                 intro: "<center>And now voters can easily answer the question of whether or not to reelect or replace their congressman. <br><br> <strong>You can bet EasyBallot.org is going to change elections </strong> <br><br>  Share us on facebook and spread the word!<br><span fb-like></span></center>"
-            }
-            ],
+            }],
             showStepNumbers: false,
+            showProgress: true,
             showBullets: false,
-            exitOnOverlayClick: true,
+            exitOnOverlayClick: false,
             exitOnEsc: true,
             nextLabel: '<strong>NEXT</strong>',
             prevLabel: '<span style="color:green">Previous</span>',
-            skipLabel: 'Exit',
-            doneLabel: 'Exit Tour'
+            skipLabel: 'Exit Tour',
+            doneLabel: 'Exit Tour',
+            overlayOpacity: '0.3'
         };
         $scope.showInitialLanding = true;
         //$scope.reps = [];
@@ -102,6 +98,18 @@ app.controller('landingCtrl', ['$scope', '$http', '$rootScope', '$location',
                 $scope.CallMe();
             }, 800);
             //$timeout(function() {$scope.CallMe();},40);
+        };
+
+        $scope.CompletedEvent = function() {
+            console.log("Completed Event called");
+            $scope.showInitialLanding = true;
+            $scope.showStep1 = false;
+        };
+
+        $scope.ExitEvent = function() {
+            console.log("Exit Event called");
+            $scope.showInitialLanding = true;
+            $scope.showStep1 = false;
         };
     }
 ]);

@@ -16,10 +16,12 @@ app.controller('landingCtrl', ['$scope', '$http', '$rootScope', '$location',
                 position: 'right'
             }, {
                 element: document.querySelector('#step3'),
-                intro: "<center>And we calculate a repworthiness percentage.<br><br>The percentage <em>increases</em> if you agree with your representative, but it <div class='error'>decreases</div> if the represenative <em>disagrees or abstained from voting</em>.</center>"
+                intro: "<center>And we calculate a repworthiness percentage.<br><br>The percentage <em>increases</em> if you agree with your representative, but it <div class='error'>decreases</div> if the represenative <em>disagrees or abstained from voting</em>.</center>",
+                position: 'left'
             }, {
                 element: document.querySelector('#step4'),
-                intro: "<center>You can even pick topics that are interesting to you.</center>"
+                intro: "<center>You can even pick topics that are interesting to you.</center>",
+                position: 'right'
             }, {
                 element: document.querySelector('#step5'),
                 intro: "<center>Or you can search for bills by topic, name 'obamacare', or id 'hr5109'</center>"

@@ -27,7 +27,7 @@ app.controller('landingCtrl', ['$scope', '$http', '$rootScope', '$location',
                 intro: "<center>Or you can search for bills by topic, name 'obamacare', or id 'hr5109'</center>"
             }, {
                 element: document.querySelector('#step6'),
-                intro: "<center>And now voters can easily answer the question of whether or not to reelect or replace their congressman. <br><br> <strong>You can bet EasyBallot.org is going to change elections </strong> <br><br>  Share us on facebook and spread the word!<br><span fb-like></span></center>"
+                intro: "<center>And now voters can easily answer the question of whether or not to reelect or replace their congressman. <br><br> <strong>You can bet EasyBallot.org is going to change elections </strong> <br><br>  Register to get started and share us on Facebook!<br><span fb-like></span></center>"
             }],
             showStepNumbers: false,
             showProgress: true,

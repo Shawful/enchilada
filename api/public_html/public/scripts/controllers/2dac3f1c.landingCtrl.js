@@ -2,7 +2,7 @@
 
 app.controller('landingCtrl', ['$scope', '$http', '$rootScope', '$location',
     '$timeout',
-    function($scope, http, $rootScope, $location, $timeout) {
+    function($scope, $http, $rootScope, $location, $timeout) {
         // definie initial variables
         $scope.noData = false;
         $scope.IntroOptions = {
@@ -20,6 +20,23 @@ app.controller('landingCtrl', ['$scope', '$http', '$rootScope', '$location',
             doneLabel: 'Thanks'
         };
         $scope.showInitialLanding = true;
+        //$scope.reps = [];
+
+        //fill reps with json data
+        $http.get('json/reps.json').success(function(data) {
+            $scope.reps = data; // response data 
+        }).error(function(data, status) {
+            console.log(data);
+            console.log(status);
+        });
+
+        // fill bills with json data
+        $http.get('json/bills.json').success(function(data) {
+            $scope.bills = data; // response data 
+        }).error(function(data, status) {
+            console.log(data);
+            console.log(status);
+        });
 
         $scope.sendToLoginPage = function() {
             if ($rootScope.user.isLogged != true)
@@ -57,8 +74,10 @@ app.controller('landingCtrl', ['$scope', '$http', '$rootScope', '$location',
         $scope.startTour = function() {
             console.log("started tour");
             $scope.showInitialLanding = false;
-            $scope.testShow = true;
-            $timeout(function() {$scope.CallMe();},100);
+            $scope.showStep1 = true;
+            $timeout(function() {
+                $scope.CallMe();
+            }, 600);
             //$timeout(function() {$scope.CallMe();},40);
         };
     }

@@ -1,7 +1,9 @@
 'use strict';
 
 app.controller('landingCtrl', ['$scope', '$http', '$rootScope', '$location',
-    function($scope, http, $rootScope, $location) {
+    '$timeout',
+    function($scope, http, $rootScope, $location, $timeout) {
+        // definie initial variables
         $scope.noData = false;
         $scope.IntroOptions = {
             steps: [{
@@ -17,6 +19,7 @@ app.controller('landingCtrl', ['$scope', '$http', '$rootScope', '$location',
             skipLabel: 'Exit',
             doneLabel: 'Thanks'
         };
+        $scope.showInitialLanding = true;
 
         $scope.sendToLoginPage = function() {
             if ($rootScope.user.isLogged != true)
@@ -46,7 +49,17 @@ app.controller('landingCtrl', ['$scope', '$http', '$rootScope', '$location',
             // console.log("Someone Logged in: " + sc.isLoggedIn);
         });
 
+        $scope.BeforeChangeEvent = function(targetElement) {
+            console.log("Before Change Event called");
+            console.log(targetElement);
+        };
 
-
+        $scope.startTour = function() {
+            console.log("started tour");
+            $scope.showInitialLanding = false;
+            $scope.testShow = true;
+            $timeout(function() {$scope.CallMe();},100);
+            //$timeout(function() {$scope.CallMe();},40);
+        };
     }
 ]);

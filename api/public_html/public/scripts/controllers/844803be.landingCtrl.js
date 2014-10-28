@@ -8,16 +8,39 @@ app.controller('landingCtrl', ['$scope', '$http', '$rootScope', '$location',
         $scope.IntroOptions = {
             steps: [{
                 element: document.querySelector('#step1'),
-                intro: "This is the first tooltip."
-            }],
+                intro: "<center>We look up all of your congress members for you.</center>",
+                dataPosition: 'right'
+            },
+            {
+                element: document.querySelector('#step2'),
+                intro: "<center>You vote on bills that affect you personally.</center>",
+                dataPosition: 'right'
+            },
+            {
+                element: document.querySelector('#step3'),
+                intro: "<center>And we calculate a repworthiness percentage.<br><br>The percentage <em>increases</em> if you agree with your representative, and it <div class='error'>decreases</div> if the represenative <em>disagrees or abstained from voting</em>.</center>"
+            },
+            {
+                element: document.querySelector('#step4'),
+                intro: "<center>You can even pick topics that are interesting to you.</center>"
+            },
+            {
+                element: document.querySelector('#step5'),
+                intro: "<center>Or you can search for bills by name 'obamacare' or id 'hr5109'</center>"
+            },
+            {
+                element: document.querySelector('#step6'),
+                intro: "<center>And now voters can easily answer the question of whether or not to reelect or replace their congressman. <br><br> <strong>You can bet EasyBallot.org is going to change elections </strong> <br><br>  Share us on facebook and spread the word!<br><span fb-like></span></center>"
+            }
+            ],
             showStepNumbers: false,
             showBullets: false,
             exitOnOverlayClick: true,
             exitOnEsc: true,
-            nextLabel: '<strong>NEXT!</strong>',
+            nextLabel: '<strong>NEXT</strong>',
             prevLabel: '<span style="color:green">Previous</span>',
             skipLabel: 'Exit',
-            doneLabel: 'Thanks'
+            doneLabel: 'Exit Tour'
         };
         $scope.showInitialLanding = true;
         //$scope.reps = [];
@@ -77,7 +100,7 @@ app.controller('landingCtrl', ['$scope', '$http', '$rootScope', '$location',
             $scope.showStep1 = true;
             $timeout(function() {
                 $scope.CallMe();
-            }, 600);
+            }, 800);
             //$timeout(function() {$scope.CallMe();},40);
         };
     }

@@ -88,8 +88,8 @@ app.controller('landingCtrl', ['$scope', '$http', '$rootScope', '$location',
         });
 
         $scope.BeforeChangeEvent = function(targetElement) {
-            console.log("Before Change Event called");
-            console.log(targetElement);
+            //console.log("Before Change Event called");
+            //console.log(targetElement);
         };
 
         $scope.startTour = function() {

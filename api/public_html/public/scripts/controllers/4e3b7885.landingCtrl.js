@@ -32,5 +32,7 @@ app.controller('landingCtrl', ['$scope', '$http', '$rootScope', '$location',
             // console.log("Someone Logged in: " + sc.isLoggedIn);
         });
 
+        
+
     }
 ]);

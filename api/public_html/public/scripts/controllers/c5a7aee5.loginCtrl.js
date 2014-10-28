@@ -2,7 +2,8 @@
 
 app.controller('loginCtrl', ['$scope', '$http', 'Auth', '$rootScope', '$injector', '$cookieStore', function (scope, http, Auth, $rootScope, $injector, $cookieStore) {
 // app.controller('loginCtrl', ['$scope', '$http', 'Auth', function (scope, http, auth) {
-	    
+	  //$('#registrationModalContainer').modal({show: $rootScope.showRegistration}); 
+
     scope.awesomeThings = ['HTML5 Boilerplate', 'AngularJS', 'Karma'];
     if (typeof $cookieStore.get('user') == "undefined")
     {

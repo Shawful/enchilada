@@ -8,15 +8,15 @@ app.controller('landingCtrl', ['$scope', '$http', '$rootScope', '$location',
         $scope.IntroOptions = {
             steps: [{
                 element: document.querySelector('#step1'),
-                intro: "<center>We look up all of your congress members for you.</center>",
+                intro: "<center>First, we look up all of your congress members for you.</center>",
                 position: 'left'
             }, {
                 element: document.querySelector('#step2'),
-                intro: "<center>Then vote on bills that affect you personally.</center>",
+                intro: "<center>Next, just vote on bills that affect or interest you.</center>",
                 position: 'right'
             }, {
                 element: document.querySelector('#step3'),
-                intro: "<center>And we calculate a repworthiness percentage.<br><br>The percentage <em>increases</em> if you agree with your representative, but it <div class='error'>decreases</div> if the represenative <em>disagrees or abstained from voting</em>.</center>",
+                intro: "<center>And we then calculate a repworthiness percentage.<br><br>The percentage <em>increases</em> if you agree with your representative, but it <div class='error'>decreases</div> if the represenative <em>disagrees or abstained from voting</em>.</center>",
                 position: 'left'
             }, {
                 element: document.querySelector('#step4'),

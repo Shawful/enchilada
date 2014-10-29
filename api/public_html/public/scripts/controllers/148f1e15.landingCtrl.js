@@ -9,19 +9,19 @@ app.controller('landingCtrl', ['$scope', '$http', '$rootScope', '$location',
             steps: [{
                 element: document.querySelector('#step1'),
                 intro: "<center>First, we look up all of your congress members for you.</center>",
-                position: 'left'
+                position: 'right'
             }, {
                 element: document.querySelector('#step2'),
                 intro: "<center>Next, just vote on bills that affect or interest you.</center>",
                 position: 'right'
             }, {
                 element: document.querySelector('#step3'),
-                intro: "<center>And we then calculate a repworthiness percentage.<br><br>The percentage <em>increases</em> if you agree with your representative, but it <div class='error'>decreases</div> if the represenative <em>disagrees or abstained from voting</em>.</center>",
-                position: 'left'
+                intro: "<center>And then we calculate a repworthiness percentage.<br><br>The percentage <em>increases</em> if you agree with your representative, but it <div class='error'>decreases</div> if the represenative <em>disagrees or abstained from voting</em>.</center>",
+                position: 'right'
             }, {
                 element: document.querySelector('#step4'),
                 intro: "<center>You can even pick topics that are interesting to you.</center>",
-                position: 'right'
+                position: 'left'
             }, {
                 element: document.querySelector('#step5'),
                 intro: "<center>Or you can search for bills by topic, name 'obamacare', or id 'hr5109'</center>"

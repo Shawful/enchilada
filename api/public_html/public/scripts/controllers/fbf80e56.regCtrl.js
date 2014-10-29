@@ -86,6 +86,10 @@ app.controller('regCtrl', ['$scope', '$http', '$rootScope', '$location', 'alertS
             }];
             //console.log('filters');
             //console.log($scope.filters);
+
+            //confirmation message
+
+            // send data
             var registerUserConfig = {
                 method: "POST",
                 url: $rootScope.urlRoot + '/user',
@@ -133,39 +137,52 @@ app.controller('regCtrl', ['$scope', '$http', '$rootScope', '$location', 'alertS
                 }
             };
 
+            swal({
+                    title: "Are you ready?",
+                    text: "If anything changes, you can always update your profile later",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonClass: "btn-primary",
+                    confirmButtonText: "Yes, register my profile!",
+                    closeOnConfirm: false
+                },
+                function() {
+                    swal("Success!", "Your profile has been processed.  Please click the verification link in your email to log in.", "success");
+                });
+
             //console.log(registerUserConfig.data);
             //console.log('data before it is sent off');
             //console.log(registerUserConfig.data.filters);
 
             //add http call to send registration data HERE
-            $http(registerUserConfig).success(function(data) {
-                alertService.add('registered', "Successfully registered.");
-                //console.log('made it!');
+            // $http(registerUserConfig).success(function(data) {
+            //     alertService.add('registered', "Successfully registered.");
+            //     //console.log('made it!');
 
-                // programmatically close modal window
-                //$('#registrationModalContainer').modal({show: false});   <--- Didn't work
+            //     // programmatically close modal window
+            //     //$('#registrationModalContainer').modal({show: false});   <--- Didn't work
 
-                // redirect to login
-                //$location.path('/login');
+            //     // redirect to login
+            //     //$location.path('/login');
 
-                // update $rootScope user data
-                $rootScope.user.username = $scope.$$childTail.email;
-                $rootScope.user.password = $scope.$$childTail.passwordA;
-                $rootScope.user.remember = true;
+            //     // update $rootScope user data
+            //     $rootScope.user.username = $scope.$$childTail.email;
+            //     $rootScope.user.password = $scope.$$childTail.passwordA;
+            //     $rootScope.user.remember = true;
 
-                // login programmatically
-                //Auth.login($rootScope.user, function() {}, function() {});
+            //     // login programmatically
+            //     //Auth.login($rootScope.user, function() {}, function() {});
 
-                // clear data
-                registerUserConfig = {};
+            //     // clear data
+            //     registerUserConfig = {};
 
-            }).error(function(data, status) {
-                if (status == 400) {
-                    alertService.add('already_registered', "Sorry, that user is already registered.");
-                    //console.log('didn\'t make it!');
+            // }).error(function(data, status) {
+            //     if (status == 400) {
+            //         alertService.add('already_registered', "Sorry, that user is already registered.");
+            //         //console.log('didn\'t make it!');
 
-                }
-            });
+            //     }
+            // });
         }
 
         $scope.updateGeneralInfo = function() {

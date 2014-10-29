@@ -2,8 +2,8 @@ var express = require('express');
 var cors = require('cors');
 var app = express();
 
-var server = require('http').createServer(app);
-//var fs = require('fs');
+
+////var fs = require('fs');
 //var sslOptions = {
 //  key: fs.readFileSync('/opt/apps/certs/eb-ssl-key.pem'),
 //  cert: fs.readFileSync('/opt/apps/certs/easyballot.crt'),
@@ -12,7 +12,7 @@ var server = require('http').createServer(app);
 //  rejectUnauthorized: false
 //};
 
-
+var server = require('http').createServer(app);
 
 
 var http = require('https');

@@ -50,7 +50,7 @@ exports.getUserVotedBills = function() {
                                 async.eachSeries(user.senators , function(senator , callback2){
                                     var options = {
                                         host: 'congress.api.sunlightfoundation.com',
-                                        path: '/votes?voter_ids.' + senator.id + '__exists=true&vote_type=passage&bill_id=' + bill.bill_id + '&fields=voters.' + senator.id + '.vote',
+                                        path: '/votes?voter_ids.' + senator.id + '__exists=true&vote_type=passage&bill_id=' + bill.bill_id + '&fields=voters.' + senator.id + '.vote&order=voted_at',
                                         method: 'GET',
                                         headers: {'x-apikey': apikey}
                                     };

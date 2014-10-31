@@ -236,3 +236,65 @@ exports.checkUserNameAvailability = function() {
         
     };
 };
+
+
+exports.createGuestAccount = function() {
+    return function(req, res) {
+    
+        var db = dbConnection.getDbConnection();
+        if(!db)
+            return res.status(500).send("Failed to initialize the db.");
+        var collection = db.collection('authentications');
+       var token = Math.random().toString(36).slice(2);
+       var userProfile = new Object();
+        userProfile._id = "guest_"+token+"@easyballot.org";
+        userProfile.firstName = "guest";
+        userProfile.lastName = "last";
+        userProfile.password = token;
+        userProfile.age = 27;
+        userProfile.sex = "Male";
+        userProfile.verified = true;
+        userProfile.filters = [
+                                { "name" : "Law Enforcement", "show" : true, "query" : "law enforcement" }, 
+                                { "name" : "Education", "show" : true, "query" : "education" }
+                              ];
+        userProfile.senators = [ { "id" : "C001056", "disagree" : 0 }, { "id" : "C001098", "disagree" : 0 }, { "id" : "D000399", "disagree" : 0 } ]; 
+        
+        var jsonBody = userProfile;
+        
+        if(jsonBody){
+        if(!jsonBody.password)    
+            return res.status(400).send("Password is required");
+        
+        jsonBody.password = sha1(jsonBody.password);
+        
+        //adding verification rules
+        jsonBody.verificationToken = uuid.v1();
+        jsonBody.verified = false;
+        
+        
+        collection.insert(jsonBody, {safe: true}, function(err, records) {
+            if (err) {
+                return res.status(400).send("User already exists");
+            }
+            console.log("Record added as " + records[0]._id);
+            
+            var currentTime = Date.now();
+            var expiry = currentTime+86400000; //adding a day to the current
+            
+            var tokenCollection = db.collection("tokens");
+            
+            tokenCollection.insert({_id : token ,"user_id" : userProfile._id , "expiry" : expiry},{safe: true},
+                function(err,result){
+                    if (err) {
+                    return res.status(400).send("Failed to login");
+                }
+                return res.status(200).send({"token" : token});
+            });
+        });
+        }else
+            return res.status(400).send("Bad data");
+
+    
+    };
+};

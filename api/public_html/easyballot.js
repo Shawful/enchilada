@@ -95,6 +95,8 @@ app.get('/', function(req, res) {
 
 app.post('/user', userService.createNewAccount());
 
+app.post('/user/guest', userService.createGuestAccount());
+
 app.post('/user/login', userService.login());
 
 app.post('/user/verify/:code', userService.verify());
@@ -156,3 +158,4 @@ app.post('/reset' , requireAuth() , userBillService.clearBills());
 app.post('/contact' , requireAuth() , contactService.sendFeedBack());
 
 app.post('/available' ,userService.checkUserNameAvailability() );
+

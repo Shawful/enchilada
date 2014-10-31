@@ -145,7 +145,7 @@ app.controller('regCtrl', ['$scope', '$http', '$rootScope', '$location', 'alertS
                     confirmButtonClass: "btn-primary",
                     confirmButtonText: "Yes, register my profile!",
                     closeOnConfirm: false
-                },
+                }, 
                 function() {
                     swal("Success!", "Your profile has been processed.  Please click the verification link in your email to log in.", "success");
 
@@ -154,6 +154,8 @@ app.controller('regCtrl', ['$scope', '$http', '$rootScope', '$location', 'alertS
                     //console.log('data before it is sent off');
                     //console.log(registerUserConfig.data.filters);
 
+                    
+                    // LET's SEE IF THIS WORKS!
                     //add http call to send registration data HERE
                     $http(registerUserConfig).success(function(data) {
                         //alertService.add('registered', "Successfully registered.");

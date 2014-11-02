@@ -266,8 +266,8 @@ exports.createGuestAccount = function() {
         jsonBody.password = sha1(jsonBody.password);
         
         //adding verification rules
-        jsonBody.verificationToken = uuid.v1();
-        jsonBody.verified = false;
+        //jsonBody.verificationToken = uuid.v1();
+        //jsonBody.verified = false;
         
         
         collection.insert(jsonBody, {safe: true}, function(err, records) {

@@ -254,10 +254,7 @@ exports.createGuestAccount = function() {
         userProfile.age = 27;
         userProfile.sex = "Male";
         userProfile.verified = true;
-        userProfile.filters = [
-                                { "name" : "Law Enforcement", "show" : true, "query" : "law enforcement" }, 
-                                { "name" : "Education", "show" : true, "query" : "education" }
-                              ];
+        userProfile.filters = getGuestFilters();
         userProfile.senators = [ { "id" : "C001056", "disagree" : 0 }, { "id" : "C001098", "disagree" : 0 }, { "id" : "D000399", "disagree" : 0 } ]; 
         
         var jsonBody = userProfile;
@@ -298,3 +295,74 @@ exports.createGuestAccount = function() {
     
     };
 };
+
+
+function getGuestFilters(){
+    var filters = [		{
+                "name": "Most Recent",
+                "show": true,
+                "query": "mostRecent"
+            }, {
+                "name": "Law Enforcement",
+               "show": true,
+                "query": "law enforcement"
+            }, {
+                "name": "Education",
+               "show": true,
+                "query": "education"
+            }, {
+                "name": "Health Care",
+                "show": true,
+                "query": "health care"
+            }, {
+                "name": "Veterans",
+                "show": true,
+                "query": "veterans"
+            }, {
+                "name": "Children",
+                "show": true,
+                "query": "children"
+            }, {
+                "name": "Minorities",
+                "show": true,
+                "query": "minority"
+            }, {
+                "name": "Foreign Aid",
+               "show": true,
+                "query": "foreign aid"
+            }, {
+                "name": "Immigration",
+                "show": true,
+                "query": "immigration"
+            }, {
+                "name": "Taxes",
+                "show": true,
+                "query": "taxes"
+            }, {
+                "name": "Defense Spending",
+               "show": true,
+                "query": "defense spending"
+            }, {
+                "name": "Privacy",
+               "show": true,
+                "query": "privacy"
+            }, {
+                "name": "Disaster Relief",
+               "show": true,
+                "query": "disaster relief"
+            }, {
+                "name": "Religion",
+                "show": true,
+                "query": "religion"
+            }, {
+                "name": "Women's Rights",
+                "show": true,
+                "query": "abortion"
+            }, {
+                "name": "LGBT",
+               "show": true,
+                "query": "lgbt"
+            }];
+        
+        return filters;
+}

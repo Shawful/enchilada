@@ -79,6 +79,8 @@ app.config(['$routeProvider', '$locationProvider', function($routeProvider, $loc
 
 app.run(['$rootScope', '$location', '$cookieStore', '$http', 'Auth', function($rootScope, $location, $cookieStore, $http, auth) {
     //$scope.$apply();
+    console.log('before:');
+    console.log($rootScope.user);
     $rootScope.facebookAppId = '345699855603648';
     $rootScope.urlRoot = 'http://ec2-54-172-95-254.compute-1.amazonaws.com:3000';
     //$rootScope.urlRoot = '';
@@ -107,25 +109,26 @@ app.run(['$rootScope', '$location', '$cookieStore', '$http', 'Auth', function($r
         role: userRoles.visitor
     };
     //console.log ('username : ');
-    //console.log($rootScope.user);
+    console.log('after: ');
+    console.log($rootScope.user);
     $http.defaults.headers.common['x-auth'] = $cookieStore.get('x-auth');
     //console.log('authtoken : ' + $cookieStore.get('x-auth'));
 
     // route user to home page if token is valid in cookie using our smallest $http request
-    if ($rootScope.user.username == 'Guest') {
+    if ($rootScope.user.username === 'Guest') {
         //console.log('bad token!');//
         if ($cookieStore.get('token')) {
             console.log('the guest has been here before');
 
-            $rootScope.user.username = 'Guest';
-            $rootScope.user.isLogged = true;
-            $rootScope.user.role = $rootScope.userRoles.user;
-            $rootScope.user.authtoken = $cookieStore.get('token');
-            $rootScope.user.password = '';
-            $rootScope.user.remember = '';
-            $rootScope.$broadcast('someoneLoggedIn');
-            $rootScope.$emit('someoneLoggedIn');
-            $location.path('/home');
+            // $rootScope.user.username = 'Guest';
+            // $rootScope.user.isLogged = true;
+            // $rootScope.user.role = $rootScope.userRoles.user;
+            // $rootScope.user.authtoken = $cookieStore.get('token');
+            // $rootScope.user.password = '';
+            // $rootScope.user.remember = '';
+            // $rootScope.$broadcast('someoneLoggedIn');
+            // $rootScope.$emit('someoneLoggedIn');
+            // $location.path('/home');
         }
     } else {
         //console.log('valid token!');
@@ -157,7 +160,7 @@ app.run(['$rootScope', '$location', '$cookieStore', '$http', 'Auth', function($r
             //console.log("$rootScope.user: " + angular.toJson($rootScope.user));
 
             // Check if the current user has a profile or is an admin
-            if (($rootScope.user.role === userRoles.user || $rootScope.user.role === userRoles.admin) && $rootScope.user.username != 'Guest') {
+            if (($rootScope.user.role === userRoles.user || $rootScope.user.role === userRoles.admin)) {
                 // console.log("test: " + userRole.user);
                 $location.path('/');
             } else {

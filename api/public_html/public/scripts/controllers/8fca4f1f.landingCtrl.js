@@ -4,7 +4,7 @@ app.controller('landingCtrl', ['$scope', '$http', '$rootScope', '$location',
     '$timeout', '$cookieStore', 'alertService', 'Auth',
     function($scope, $http, $rootScope, $location, $timeout, $cookieStore, alertService, Auth) {
         // definie initial variables
-        $rootScope.user.username = 'Guest';
+        //$rootScope.user.username = 'Guest';
         $rootScope.user.password = '';
         $rootScope.user.remember = '';
         $scope.noData = false;

@@ -27,8 +27,6 @@ angular.module("wizard.html", []).run(["$templateCache", function($templateCache
 
 angular.module('mgo-angular-wizard', ['templates-angularwizard']);
 
-//Another directive?
-
 angular.module('mgo-angular-wizard').directive('wzStep', function() {
     return {
         restrict: 'EA',
@@ -48,8 +46,6 @@ angular.module('mgo-angular-wizard').directive('wzStep', function() {
         }
     }
 });
-
-//A third directive??? (with a controller in there too for good measure)
 
 angular.module('mgo-angular-wizard').directive('wizard', function() {
     return {
@@ -74,8 +70,6 @@ angular.module('mgo-angular-wizard').directive('wizard', function() {
             });
 
             $scope.steps = [];
-
-
 
             $scope.$watch('currentStep', function(step) {
                 if (!step) return;
@@ -129,7 +123,6 @@ angular.module('mgo-angular-wizard').directive('wizard', function() {
                     this.finish();
                 } else {
                     $scope.goTo($scope.steps[index + 1]);
-                    //alert('next!');
                 }
             };
 
@@ -141,7 +134,6 @@ angular.module('mgo-angular-wizard').directive('wizard', function() {
                     stepTo = _.findWhere($scope.steps, {title: step});
                 }
                 $scope.goTo(stepTo);
-
             };
 
             this.finish = function() {
@@ -161,9 +153,6 @@ angular.module('mgo-angular-wizard').directive('wizard', function() {
         }]
     };
 });
-
-
-//Directive
 
 function wizardButtonDirective(action) {
     angular.module('mgo-angular-wizard')
@@ -190,11 +179,6 @@ wizardButtonDirective('wzNext');
 wizardButtonDirective('wzPrevious');
 wizardButtonDirective('wzFinish');
 wizardButtonDirective('wzCancel');
-
-
-
-
-//Service
 
 angular.module('mgo-angular-wizard').factory('WizardHandler', function() {
    var service = {};

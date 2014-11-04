@@ -27,5 +27,7 @@ angular.module('politicheckApp')
 
         }).error(function(data, status) {
         	$scope.error = true;
+            console.log(data);
+            console.log(status);
         });
     }]);

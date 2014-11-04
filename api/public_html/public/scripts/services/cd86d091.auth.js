@@ -83,6 +83,12 @@ angular.module('politicheckApp')
                 guestLogin: function() {
                     console.log('guest login');
 
+                    $rootScope.user = {
+                        'username': 'Guest',
+                        isLogged: true,
+                        role: userRoles.user,
+                        'authtoken': ''
+                    };
                     var user = $rootScope.user;
                     var loginConfig = {
                         method: "POST",
@@ -110,12 +116,6 @@ angular.module('politicheckApp')
                         // use the alert service to notify that a user is logged in
                         alertService.add("login", "Welcome, " + $rootScope.user.username + "!");
 
-                        $rootScope.user = {
-                            'username': user.username,
-                            isLogged: true,
-                            role: userRoles.user,
-                            'authtoken': $authToken
-                        };
                         //console.log($rootScope.user);
 
                         //console.log ('token :' + $rootScope.user.authtoken);

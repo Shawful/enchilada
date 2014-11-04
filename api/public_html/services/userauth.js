@@ -17,7 +17,7 @@ exports.createNewAccount = function() {
         var jsonBody = req.body;
         
         if(jsonBody){
-        if(!jsonBody.password)    
+        if(!jsonBody.password || jsonBody.password === "")    
             return res.status(400).send("Password is required");
         
         jsonBody.password = sha1(jsonBody.password);
@@ -57,7 +57,8 @@ exports.login = function() {
                     return res.status(500).send("Failed to initialize the db.");
         var collection = db.collection('authentications');
         
-        
+        if(!password || password === "")    
+            return res.status(400).send("Password is required");
         password = sha1(password);
         
         

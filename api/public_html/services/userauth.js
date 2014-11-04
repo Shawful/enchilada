@@ -69,6 +69,7 @@ exports.login = function() {
                 return res.status(400).send("Failed");
             }
             if(result === null){
+                console.log("username : "+username+" password : "+password );
                 return res.status(404).send("username/password incorrect");
             }
             

@@ -119,7 +119,7 @@ app.run(['$rootScope', '$location', '$cookieStore', '$http', 'Auth', function($r
         //console.log('bad token!');//
         if ($cookieStore.get('token')) {
             console.log('the guest has been here before');
-
+            auth.guestLogin();
             // $rootScope.user.username = 'Guest';
             // $rootScope.user.isLogged = true;
             // $rootScope.user.role = $rootScope.userRoles.user;
